@@ -73,7 +73,7 @@ public class IncidMatrixUndir implements Graph {
     public void addEdge(Edge edge) throws IllegalArgumentException {
         if (edge == null || !this.containsVertex(edge.getSource()) || !this.containsVertex(edge.getTarget()))
             throw new IllegalArgumentException("Cannot have an edge with invalid source/target");
-        if (edges.contains(edge))
+        if (edges.contains(edge) || edges.contains(Edge.getEdgeByVertexes(edge.getTarget(), edge.getSource())))
             throw new IllegalArgumentException("The edge is already present");
 
         this.edges.add(edge);
