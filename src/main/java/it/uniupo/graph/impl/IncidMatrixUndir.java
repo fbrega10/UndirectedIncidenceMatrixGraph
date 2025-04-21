@@ -17,13 +17,14 @@ public class IncidMatrixUndir implements Graph {
     private List<Edge> edges;
     private Integer[][] matrix;
 
+    /**
+     * Constructor of an empty IncidentMatrix, all the fields
+     * are initialized to represent an empty Graph with no vertexes/edges.
+     */
     protected IncidMatrixUndir() {
-    }
-
-    public IncidMatrixUndir(int vertexes, int edges) {
-        this.vertexes = new ArrayList<>(vertexes);
-        this.edges = new ArrayList<>(edges);
-        this.matrix = new Integer[vertexes][edges];
+        this.vertexes = new ArrayList<>();
+        this.edges = new ArrayList<>();
+        this.matrix = new Integer[0][0];
     }
 
     @Override
@@ -31,17 +32,19 @@ public class IncidMatrixUndir implements Graph {
         return 0;
     }
 
+    /**
+     * @param vertex
+     * @return an integer: -1 if the vertex is already present in the matrix
+     * 0 if the operation is successfull, in this case the matrix is resized and
+     * a new row is added, all its edges are 0.
+     */
     public int addVertex(Integer vertex){
         if (vertex == null || this.vertexes.contains(vertex))
             return -1;
         this.vertexes.add(vertex);
-        Integer[][] newMatrix =  new Integer[vertexes.size()][edges.size()];
-        for (int i = 0; i < vertexes.size(); ++i)
-            for (int j = 0; j < edges.size(); ++j)
-                newMatrix[i][j] = this.matrix[i][j];
+        this.matrix = resize(this.matrix, vertexes.size(),edges.size());
         for (int i = 0; i < edges.size(); ++i)
-            newMatrix[vertexes.size() - 1][i] = 0;
-        this.matrix = newMatrix;
+            this.matrix[vertexes.size() - 1][i] = 0;
         return 0;
     }
 
@@ -73,17 +76,13 @@ public class IncidMatrixUndir implements Graph {
     public void addEdge(Edge edge) throws IllegalArgumentException {
         if (edge == null || !this.containsVertex(edge.getSource()) || !this.containsVertex(edge.getTarget()))
             throw new IllegalArgumentException("Cannot have an edge with invalid source/target");
-        if (edges.contains(edge) || edges.contains(Edge.getEdgeByVertexes(edge.getTarget(), edge.getSource())))
+        if (edges.contains(edge))
             throw new IllegalArgumentException("The edge is already present");
 
         this.edges.add(edge);
-        Integer[][] newMatrix =  new Integer[vertexes.size()][edges.size()];
+        this.matrix = resize(matrix, vertexes.size(), edges.size());
         for (int i = 0; i < vertexes.size(); ++i)
-            for (int j = 0; j < edges.size(); ++j)
-                newMatrix[i][j] = this.matrix[i][j];
-        for (int i = 0; i < vertexes.size(); ++i)
-            newMatrix[i][edges.size() - 1] = 0;
-        this.matrix = newMatrix;
+            this.matrix[i][edges.size() - 1] = 0;
     }
 
     @Override
@@ -108,7 +107,9 @@ public class IncidMatrixUndir implements Graph {
 
     @Override
     public int size() {
-        return 0;
+        if (this.matrix.length == 0)
+            return 0;
+        return this.matrix[0].length == 0 ? matrix.length : this.matrix[0].length;
     }
 
     @Override
@@ -160,4 +161,19 @@ public class IncidMatrixUndir implements Graph {
     public Set<Set<Integer>> connectedComponents() throws UnsupportedOperationException {
         return Set.of();
     }
+
+    /**
+     * Utility method, internally used to gracefully resize the matrix.
+     * @param mat the current matrix
+     * @param rowSize the row size of the new matrix
+     * @param columnSize the column size of the new matrix
+     * @return a copy of the argument passed matrix but resized as wanted.
+     */
+    protected static Integer[][] resize(Integer[][] mat, int rowSize, int columnSize){
+        Integer[][] newMatrix = new Integer[rowSize][columnSize];
+        for (int i = 0; i < mat.length; ++i)
+            System.arraycopy(mat[i], 0, newMatrix[i], 0, mat[0].length);
+        return newMatrix;
+    }
+
 }

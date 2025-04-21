@@ -1,9 +1,13 @@
 package it.uniupo.graph.impl;
 
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import upo.graph.base.Edge;
+
+import java.util.Set;
 
 class IncidMatrixUndirTest {
 
@@ -15,21 +19,41 @@ class IncidMatrixUndirTest {
     }
 
     @Test
-    void constructorTest(){
-        matrixUndir = new IncidMatrixUndir(2, 2);
-        Assertions.assertEquals(2, matrixUndir);
+    void emptyConstructorTest(){
+        Assertions.assertEquals(0, matrixUndir.getVertices().size());
+        Assertions.assertEquals(0, matrixUndir.getEdges().size());
     }
 
     @Test
     void addVertex() {
+        matrixUndir.addVertex(20);
+        Assertions.assertEquals(1, matrixUndir.getVertices().size());
+        Assertions.assertEquals(1, matrixUndir.size());
+        matrixUndir.addVertex(30);
+        Assertions.assertEquals(2, matrixUndir.getVertices().size());
+        Assertions.assertEquals(2, matrixUndir.size());
     }
 
     @Test
     void getVertices() {
+        matrixUndir.addVertex(30);
+        matrixUndir.addVertex(20);
+        Assertions.assertEquals(Set.of(30, 20), matrixUndir.getVertices());
     }
 
     @Test
     void getEdges() {
+        matrixUndir.addVertex(30);
+        matrixUndir.addVertex(20);
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(20, 30));
+        Assertions.assertEquals(1, matrixUndir.getEdges().size());
+    }
+
+    @Test
+    void resizeTest(){
+        Integer[][] matrix = IncidMatrixUndir.resize(new Integer[0][0], 2, 2);
+        Assertions.assertEquals(2, matrix.length);
+        Assertions.assertEquals(2, matrix[0].length);
     }
 
     @Test
@@ -102,5 +126,9 @@ class IncidMatrixUndirTest {
 
     @Test
     void connectedComponents() {
+    }
+    @AfterEach
+    void postConstruct(){
+        matrixUndir = new IncidMatrixUndir();
     }
 }
