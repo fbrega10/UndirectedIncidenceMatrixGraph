@@ -35,19 +35,22 @@ public class IncidMatrixUndir implements Graph {
     /**
      * @param vertex
      * @return an integer: -1 if the vertex is already present in the matrix
-     * 0 if the operation is successfull, in this case the matrix is resized and
-     * a new row is added, all its edges are 0.
+     * 0 if the operation is successfull, then it is resized and
+     * a new row is added, all the corresponding edges are 0.
      */
-    public int addVertex(Integer vertex){
+    public int addVertex(Integer vertex) {
         if (vertex == null || this.vertexes.contains(vertex))
             return -1;
         this.vertexes.add(vertex);
-        this.matrix = resize(this.matrix, vertexes.size(),edges.size());
-        for (int i = 0; i < edges.size(); ++i)
-            this.matrix[vertexes.size() - 1][i] = 0;
+        this.matrix = resize(this.matrix, vertexes.size(), edges.size());
+        for (int i = 0; i < this.edges.size(); ++i)
+            this.matrix[vertexesArraySize()][i] = 0;
         return 0;
     }
 
+    /**
+     * @return A set of vertexes.
+     */
     @Override
     public Set<Integer> getVertices() {
         if (vertexes.isEmpty())
@@ -56,11 +59,18 @@ public class IncidMatrixUndir implements Graph {
             return new HashSet<>(vertexes);
     }
 
+    /**
+     * @return An HashSet of edges.
+     */
     @Override
     public Set<Edge> getEdges() {
         return new HashSet<>(edges);
     }
 
+    /**
+     * @param integer
+     * @return a boolean whether the vertex is included or not
+     */
     @Override
     public boolean containsVertex(Integer integer) {
         return integer != null && this.vertexes.contains(integer);
@@ -81,13 +91,25 @@ public class IncidMatrixUndir implements Graph {
 
         this.edges.add(edge);
         this.matrix = resize(matrix, vertexes.size(), edges.size());
-        for (int i = 0; i < vertexes.size(); ++i)
-            this.matrix[i][edges.size() - 1] = 0;
+        for (int i = 0; i <= vertexesArraySize(); ++i) {
+            Integer currentVertex = vertexes.get(i);
+            if (currentVertex.equals(edge.getSource()) || currentVertex.equals(edge.getTarget()))
+                matrix[i][edgesArraySize()] = 1;
+            else
+                matrix[i][edgesArraySize()] = 0;
+        }
     }
 
+    /**
+     * @param edge
+     * @return boolean, the edge is in the list?
+     * @throws IllegalArgumentException
+     */
     @Override
     public boolean containsEdge(Edge edge) throws IllegalArgumentException {
-        return false;
+        if (edge == null || !this.vertexes.contains(edge.getTarget()) || !this.vertexes.contains(edge.getSource()))
+            throw new IllegalArgumentException("Error, the current edge is invalid");
+        return edges.contains(edge);
     }
 
     @Override
@@ -164,16 +186,40 @@ public class IncidMatrixUndir implements Graph {
 
     /**
      * Utility method, internally used to gracefully resize the matrix.
-     * @param mat the current matrix
-     * @param rowSize the row size of the new matrix
+     *
+     * @param mat        the current matrix
+     * @param rowSize    the row size of the new matrix
      * @param columnSize the column size of the new matrix
      * @return a copy of the argument passed matrix but resized as wanted.
      */
-    protected static Integer[][] resize(Integer[][] mat, int rowSize, int columnSize){
+    protected static Integer[][] resize(Integer[][] mat, int rowSize, int columnSize) {
         Integer[][] newMatrix = new Integer[rowSize][columnSize];
         for (int i = 0; i < mat.length; ++i)
             System.arraycopy(mat[i], 0, newMatrix[i], 0, mat[0].length);
         return newMatrix;
     }
 
+    protected int vertexesArraySize() {
+        return !this.vertexes.isEmpty() ? vertexes.size() - 1 : 0;
+    }
+
+    protected int edgesArraySize() {
+        return !this.edges.isEmpty() ? edges.size() - 1 : 0;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Incident matrix : \n");
+        for (int i = 0; i < vertexes.size(); ++i) {
+            sb.append("[");
+            for (int j = 0; j < edges.size(); ++j) {
+                sb.append(this.matrix[i][j]);
+                if (j + 1 < edges.size())
+                    sb.append(", ");
+            }
+            sb.append("]\n");
+        }
+        return sb.toString();
+    }
 }
