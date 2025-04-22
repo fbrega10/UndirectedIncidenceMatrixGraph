@@ -59,13 +59,6 @@ class IncidMatrixUndirTest {
     }
 
     @Test
-    void resizeTest() {
-        Integer[][] matrix = IncidMatrixUndir.resize(new Integer[0][0], 2, 2);
-        Assertions.assertEquals(2, matrix.length);
-        Assertions.assertEquals(2, matrix[0].length);
-    }
-
-    @Test
     void containsVertex() {
         matrixUndir.addVertex(13);
         matrixUndir.addVertex(123);

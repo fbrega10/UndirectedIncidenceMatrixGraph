@@ -42,9 +42,7 @@ public class IncidMatrixUndir implements Graph {
         if (vertex == null || this.vertexes.contains(vertex))
             return -1;
         this.vertexes.add(vertex);
-        this.matrix = resize(this.matrix, vertexes.size(), edges.size());
-        for (int i = 0; i < this.edges.size(); ++i)
-            this.matrix[vertexes.size() - 1][i] = 0;
+        this.rebuildMatrix();
         return 0;
     }
 
@@ -208,21 +206,6 @@ public class IncidMatrixUndir implements Graph {
     @Override
     public Set<Set<Integer>> connectedComponents() throws UnsupportedOperationException {
         return Set.of();
-    }
-
-    /**
-     * Utility method, internally used to gracefully resize the matrix.
-     *
-     * @param mat        the current matrix
-     * @param rowSize    the row size of the new matrix
-     * @param columnSize the column size of the new matrix
-     * @return a copy of the argument passed matrix but resized as wanted.
-     */
-    protected static Integer[][] resize(Integer[][] mat, int rowSize, int columnSize) {
-        Integer[][] newMatrix = new Integer[rowSize][columnSize];
-        for (int i = 0; i < mat.length; ++i)
-            System.arraycopy(mat[i], 0, newMatrix[i], 0, mat[0].length);
-        return newMatrix;
     }
 
     /**
