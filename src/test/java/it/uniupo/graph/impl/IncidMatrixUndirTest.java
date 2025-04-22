@@ -1,7 +1,6 @@
 package it.uniupo.graph.impl;
 
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,19 +29,22 @@ class IncidMatrixUndirTest {
     void addVertex() {
         Assertions.assertEquals(0, matrixUndir.addVertex(20));
         Assertions.assertEquals(1, matrixUndir.getVertices().size());
-        Assertions.assertEquals(1, matrixUndir.size());
         Assertions.assertEquals(0, matrixUndir.addVertex(30));
         Assertions.assertEquals(2, matrixUndir.getVertices().size());
-        Assertions.assertEquals(2, matrixUndir.size());
         Assertions.assertEquals(-1, matrixUndir.addVertex(null));
+        Assertions.assertEquals(-1, matrixUndir.addVertex(30));
         matrixUndir.addEdge(Edge.getEdgeByVertexes(20, 30));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.addEdge(Edge.getEdgeByVertexes(20, 234782)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.addEdge(Edge.getEdgeByVertexes(234782, 20)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.addEdge(Edge.getEdgeByVertexes(20, 30)));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.addEdge(null));
         Assertions.assertEquals(0, matrixUndir.addVertex(13));
         matrixUndir.addEdge(Edge.getEdgeByVertexes(13, 20));
-        //System.out.println(matrixUndir.toString());
     }
 
     @Test
     void getVertices() {
+        Assertions.assertEquals(0, matrixUndir.getVertices().size());
         matrixUndir.addVertex(30);
         matrixUndir.addVertex(20);
         Assertions.assertEquals(Set.of(30, 20), matrixUndir.getVertices());
@@ -71,6 +73,7 @@ class IncidMatrixUndirTest {
         Assertions.assertTrue(matrixUndir.containsVertex(123));
         Assertions.assertFalse(matrixUndir.containsVertex(23432));
         Assertions.assertFalse(matrixUndir.containsVertex(432));
+        Assertions.assertFalse(matrixUndir.containsVertex(null));
     }
 
     @Test
@@ -79,6 +82,12 @@ class IncidMatrixUndirTest {
         Assertions.assertThrows(NoSuchElementException.class, () -> matrixUndir.removeVertex(390));
         matrixUndir.addVertex(234);
         matrixUndir.addVertex(34);
+        matrixUndir.addVertex(15);
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(234, 34));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(234, 15));
+        System.out.println(matrixUndir.toString());
+        matrixUndir.removeVertex(34);
+        System.out.println(matrixUndir.toString());
     }
 
     @Test
@@ -106,18 +115,54 @@ class IncidMatrixUndirTest {
 
     @Test
     void removeEdge() {
+        matrixUndir.addVertex(123);
+        matrixUndir.addVertex(13);
+        Edge current = Edge.getEdgeByVertexes(123, 13);
+        matrixUndir.addEdge(current);
+        Assertions.assertEquals(1, matrixUndir.getEdges().size());
+        matrixUndir.removeEdge(current);
+        Assertions.assertEquals(0, matrixUndir.getEdges().size());
+        Assertions.assertThrows(NoSuchElementException.class, () -> matrixUndir.removeEdge(current));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.removeEdge(null));
     }
 
     @Test
     void getAdjacent() {
+        matrixUndir.addVertex(30);
+        matrixUndir.addVertex(45);
+        matrixUndir.addVertex(130);
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(30, 45));
+        Assertions.assertEquals(45, matrixUndir.getAdjacent(30).iterator().next());
+        Assertions.assertEquals(0, matrixUndir.getAdjacent(130).size());
+        Assertions.assertThrows(NoSuchElementException.class, () -> matrixUndir.getAdjacent(0));
+        Assertions.assertThrows(NoSuchElementException.class, () -> matrixUndir.getAdjacent(null));
+        Assertions.assertEquals(30, matrixUndir.getAdjacent(45).iterator().next());
     }
 
     @Test
     void isAdjacent() {
+        matrixUndir.addVertex(30);
+        matrixUndir.addVertex(20);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.isAdjacent(null, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.isAdjacent(30, null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.isAdjacent(30, 323));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.isAdjacent(323, 30));
+        Assertions.assertFalse(matrixUndir.isAdjacent(20, 30));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(30, 20));
+        Assertions.assertTrue(matrixUndir.isAdjacent(20, 30));
+        Assertions.assertTrue(matrixUndir.isAdjacent(30, 20));
+        matrixUndir.removeEdge(Edge.getEdgeByVertexes(30, 20));
+        Assertions.assertFalse(matrixUndir.isAdjacent(20, 30));
     }
 
     @Test
     void size() {
+        Assertions.assertEquals(0, matrixUndir.size());
+        matrixUndir.addVertex(30);
+        matrixUndir.addVertex(20);
+        Assertions.assertEquals(0, matrixUndir.size());
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(30, 20));
+        Assertions.assertEquals(2, matrixUndir.size());
     }
 
     @Test
@@ -158,10 +203,5 @@ class IncidMatrixUndirTest {
 
     @Test
     void connectedComponents() {
-    }
-
-    @AfterEach
-    void postConstruct() {
-        matrixUndir = new IncidMatrixUndir();
     }
 }
