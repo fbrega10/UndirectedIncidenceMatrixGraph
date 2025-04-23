@@ -175,11 +175,19 @@ class IncidMatrixUndirTest {
     void getBFSTree() {
         matrixUndir.addVertex(30);
         matrixUndir.addVertex(345);
+        matrixUndir.addVertex(70);
+        matrixUndir.addVertex(56);
         matrixUndir.addEdge(Edge.getEdgeByVertexes(30, 345));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(345, 56));
         VisitResult visitResult = matrixUndir.getBFSTree(30);
         Assertions.assertNotNull(visitResult);
         Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(30));
         Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(345));
+        Assertions.assertEquals(30, visitResult.getPartent(345));
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(56));
+        Assertions.assertEquals(345, visitResult.getPartent(56));
+        Assertions.assertEquals(VisitResult.Color.WHITE, visitResult.getColor(70));
+        Assertions.assertNull(visitResult.getPartent(30));
     }
 
     @Test

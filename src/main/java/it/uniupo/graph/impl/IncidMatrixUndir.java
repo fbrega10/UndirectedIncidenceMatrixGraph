@@ -137,12 +137,15 @@ public class IncidMatrixUndir implements Graph {
         if (integer == null || !vertexes.contains(integer))
             throw new NoSuchElementException("Vertex is not present!");
         HashSet<Integer> hashSet = new HashSet<>();
-        edges.forEach(edge -> {
-            if (edge.getTarget().equals(integer))
-                hashSet.add(edge.getSource());
-            else if (edge.getSource().equals(integer))
-                hashSet.add(edge.getTarget());
-        });
+        for (int i = 0; i < edges.size(); ++i){
+            if (matrix[vertexes.indexOf(integer)][i] == 1){
+                Edge currentEdge = edges.get(i);
+                if (currentEdge.getTarget().equals(integer))
+                    hashSet.add(currentEdge.getSource());
+                else
+                    hashSet.add(currentEdge.getTarget());
+            }
+        }
         return hashSet;
     }
 
@@ -186,7 +189,6 @@ public class IncidMatrixUndir implements Graph {
         LinkedList<Integer> queue = new LinkedList<>();
         vertexes.forEach(vert -> visitResult.setColor(vert, VisitResult.Color.WHITE));
         queue.addLast(integer);
-        //visitResult.setParent(integer, null);
         visitResult.setDistance(integer, 0);
         visitResult.setColor(integer, VisitResult.Color.GRAY);
         while (!queue.isEmpty()) {
