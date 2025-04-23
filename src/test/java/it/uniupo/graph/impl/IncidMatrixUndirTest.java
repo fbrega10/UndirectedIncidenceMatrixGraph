@@ -188,6 +188,8 @@ class IncidMatrixUndirTest {
         Assertions.assertEquals(345, visitResult.getPartent(56));
         Assertions.assertEquals(VisitResult.Color.WHITE, visitResult.getColor(70));
         Assertions.assertNull(visitResult.getPartent(30));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.getBFSTree(1231));
     }
 
     @Test
