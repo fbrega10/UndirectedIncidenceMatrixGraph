@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import upo.graph.base.Edge;
+import upo.graph.base.VisitResult;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -172,6 +173,13 @@ class IncidMatrixUndirTest {
 
     @Test
     void getBFSTree() {
+        matrixUndir.addVertex(30);
+        matrixUndir.addVertex(345);
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(30, 345));
+        VisitResult visitResult = matrixUndir.getBFSTree(30);
+        Assertions.assertNotNull(visitResult);
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(30));
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(345));
     }
 
     @Test

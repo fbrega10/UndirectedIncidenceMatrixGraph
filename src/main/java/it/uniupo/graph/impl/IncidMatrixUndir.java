@@ -7,8 +7,11 @@ import upo.graph.base.VisitResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 
 public class IncidMatrixUndir implements Graph {
@@ -175,7 +178,31 @@ public class IncidMatrixUndir implements Graph {
 
     @Override
     public VisitResult getBFSTree(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
-        return null;
+
+        if (!this.containsVertex(integer))
+            throw new IllegalArgumentException("The vertex does not belong to the graph.");
+
+        VisitResult visitResult = new VisitResult(this);
+        LinkedList<Integer> queue = new LinkedList<>();
+        vertexes.forEach(vert -> visitResult.setColor(vert, VisitResult.Color.WHITE));
+        queue.addLast(integer);
+        //visitResult.setParent(integer, null);
+        visitResult.setDistance(integer, 0);
+        visitResult.setColor(integer, VisitResult.Color.GRAY);
+        while (!queue.isEmpty()) {
+            Integer top = queue.getFirst();
+            this.getAdjacent(top).stream()
+                    .filter(vert -> visitResult.getColor(vert).equals(VisitResult.Color.WHITE))
+                    .forEach(vert -> {
+                        visitResult.setColor(vert, VisitResult.Color.GRAY);
+                        visitResult.setParent(vert, top);
+                        visitResult.setDistance(vert, visitResult.getDistance(top) + 1);
+                        queue.addLast(vert);
+                    });
+            visitResult.setColor(top, VisitResult.Color.BLACK);
+            queue.removeFirst();
+        }
+        return visitResult;
     }
 
     @Override
