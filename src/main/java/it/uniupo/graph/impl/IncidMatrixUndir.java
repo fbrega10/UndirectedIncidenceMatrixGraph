@@ -7,16 +7,14 @@ import upo.graph.base.VisitResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class IncidMatrixUndir implements Graph {
 
-    private List<Integer> vertexes;
     private List<Edge> edges;
     private Integer[][] matrix;
 
@@ -25,39 +23,25 @@ public class IncidMatrixUndir implements Graph {
      * are initialized to represent an empty Graph with no vertexes/edges.
      */
     protected IncidMatrixUndir() {
-        this.vertexes = new ArrayList<>();
         this.edges = new ArrayList<>();
         this.matrix = new Integer[0][0];
     }
 
     @Override
     public int addVertex() {
-        return 0;
+        int vertexIdx = this.size();
+        this.rebuildMatrix(matrix.length + 1);
+        return vertexIdx;
     }
 
     /**
-     * @param vertex
-     * @return an integer: -1 if the vertex is already present in the matrix
-     * 0 if the operation is successfull, then it is resized and
-     * a new row is added, all the corresponding edges are 0.
-     */
-    public int addVertex(Integer vertex) {
-        if (vertex == null || this.vertexes.contains(vertex))
-            return -1;
-        this.vertexes.add(vertex);
-        this.rebuildMatrix();
-        return 0;
-    }
-
-    /**
-     * @return A set of vertexes.
+     * @return A set of vertexes, empty if there's no vertexes
      */
     @Override
     public Set<Integer> getVertices() {
-        if (vertexes.isEmpty())
-            return Collections.emptySet();
-        else
-            return new HashSet<>(vertexes);
+        return this.size() > 0 ? IntStream.range(0, matrix.length)
+                .boxed()
+                .collect(Collectors.toSet()) : Collections.emptySet();
     }
 
     /**
@@ -74,30 +58,30 @@ public class IncidMatrixUndir implements Graph {
      */
     @Override
     public boolean containsVertex(Integer integer) {
-        return integer != null && this.vertexes.contains(integer);
+        return integer != null && integer < this.size();
     }
 
     @Override
     public void removeVertex(Integer integer) throws NoSuchElementException {
         if (!this.containsVertex(integer))
             throw new NoSuchElementException("No such vertex!");
-        vertexes.remove(integer);
-        for (int i = 0; i < edges.size(); ++i) {
-            Edge e = edges.get(i);
-            if (e.getTarget().equals(integer) || e.getSource().equals(integer))
-                edges.remove(e);
+        for (int i = 0; i < edges.size(); ++i){
+            if (matrix[integer][i] == 1){
+                Edge edge = edges.get(i);
+                this.removeEdge(edge);
+            }
         }
-        this.rebuildMatrix();
+        //TODO: devi sistemare da qui
     }
 
     @Override
     public void addEdge(Edge edge) throws IllegalArgumentException {
         if (edge == null || !this.containsVertex(edge.getSource()) || !this.containsVertex(edge.getTarget()))
             throw new IllegalArgumentException("Cannot have an edge with invalid source/target");
-        if (edges.contains(edge))
-            throw new IllegalArgumentException("The edge is already present");
+        if (edges.contains(edge) || edges.contains(Edge.getEdgeByVertexes(edge.getTarget(), edge.getSource())))
+            return;
         this.edges.add(edge);
-        this.rebuildMatrix();
+        this.rebuildMatrix(this.size());
     }
 
     /**
@@ -107,61 +91,70 @@ public class IncidMatrixUndir implements Graph {
      */
     @Override
     public boolean containsEdge(Edge edge) throws IllegalArgumentException {
-        if (edge == null || !this.vertexes.contains(edge.getTarget()) || !this.vertexes.contains(edge.getSource()))
-            throw new IllegalArgumentException("Error, the current edge is invalid");
-        return edges.contains(edge);
+        if (!this.containsVertex(edge.getTarget()) || !this.containsVertex(edge.getSource()))
+            throw new IllegalArgumentException("Vertexes must belong to the graph!");
+        return this.edges.contains(edge)
+                || this.edges.contains(Edge.getEdgeByVertexes(edge.getTarget(), edge.getSource()));
     }
 
     /**
      * @param edge
-     * @throws IllegalArgumentException the edge is null, an exception is thrown.
-     * @throws NoSuchElementException   the edge is not included in the current edges collection.
+     * @throws IllegalArgumentException One of the vertexes doesn't belong to the Graph's vertexes.
+     * @throws NoSuchElementException   the edge is not included in the current edges.
      */
     @Override
     public void removeEdge(Edge edge) throws IllegalArgumentException, NoSuchElementException {
-        if (edge == null)
-            throw new IllegalArgumentException("Edge cannot be a null pointer, must construct first");
         if (!this.containsEdge(edge))
-            throw new NoSuchElementException("The edge is not present, choose a currently included edge!");
+            throw new NoSuchElementException("No such edge.");
         this.edges.remove(edge);
-        this.rebuildMatrix();
+        this.rebuildMatrix(this.size());
     }
 
     /**
      * @param integer
      * @return A set of vertexes adjacent the parameter (vertex).
-     * @throws NoSuchElementException in case of
+     * @throws NoSuchElementException if the vertex does not belong to the Graph.
      */
     @Override
     public Set<Integer> getAdjacent(Integer integer) throws NoSuchElementException {
-        if (integer == null || !vertexes.contains(integer))
-            throw new NoSuchElementException("Vertex is not present!");
-        HashSet<Integer> hashSet = new HashSet<>();
-        for (int i = 0; i < edges.size(); ++i){
-            if (matrix[vertexes.indexOf(integer)][i] == 1){
-                Edge currentEdge = edges.get(i);
-                if (currentEdge.getTarget().equals(integer))
-                    hashSet.add(currentEdge.getSource());
+        if (!this.containsVertex(integer))
+            throw new NoSuchElementException("The vertex does not belong to the Graph.");
+        Set<Integer> set = new HashSet<>();
+        for (int i = 0; i < edges.size(); ++i) {
+            if (matrix[integer][i] == 1) {
+                Edge e = edges.get(i);
+                if (e.getTarget().equals(integer))
+                    set.add(e.getSource());
                 else
-                    hashSet.add(currentEdge.getTarget());
+                    set.add(e.getTarget());
             }
         }
-        return hashSet;
+        return set;
     }
 
+    /**
+     * @param integer
+     * @param integer1
+     * @return boolean indicating whether the two vertexes are adjacent
+     * @throws IllegalArgumentException
+     */
     @Override
     public boolean isAdjacent(Integer integer, Integer integer1) throws IllegalArgumentException {
-        if (integer == null || integer1 == null || !vertexes.contains(integer) || !vertexes.contains(integer1))
-            throw new IllegalArgumentException("Must set two valid vertexes as function parameters.");
-        return edges.stream().anyMatch(edge -> (edge.getSource().equals(integer) && edge.getTarget().equals(integer1))
-                || (edge.getSource().equals(integer1) && edge.getTarget().equals(integer)));
+        if (!this.containsVertex(integer) || !this.containsVertex(integer1))
+            throw new IllegalArgumentException("Make sure all the vertexes are in the Graph");
+        for (int i = 0; i < edges.size(); ++i){
+            if (matrix[integer][i] == 1){
+                Edge edge = edges.get(i);
+                if (edge.getTarget().equals(integer1) || edge.getSource().equals(integer1))
+                    return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public int size() {
-        if (this.matrix.length == 0)
-            return 0;
-        return this.matrix.length * this.matrix[0].length;
+        return this.matrix.length;
     }
 
     @Override
@@ -181,7 +174,7 @@ public class IncidMatrixUndir implements Graph {
 
     @Override
     public VisitResult getBFSTree(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
-
+        /*
         if (!this.containsVertex(integer))
             throw new IllegalArgumentException("The vertex does not belong to the graph.");
 
@@ -205,6 +198,8 @@ public class IncidMatrixUndir implements Graph {
             queue.removeFirst();
         }
         return visitResult;
+         */
+        return null;
     }
 
     @Override
@@ -238,15 +233,14 @@ public class IncidMatrixUndir implements Graph {
     }
 
     /**
-     * Rebuilds the matrix from scratch.
+     * Adds one row to the matrix, enlarging the current data structure.
      */
-    protected void rebuildMatrix() {
-        this.matrix = new Integer[vertexes.size()][edges.size()];
-        for (int i = 0; i < vertexes.size(); ++i) {
+    protected void rebuildMatrix(int vertexSize) {
+        this.matrix = new Integer[vertexSize][edges.size()];
+        for (int i = 0; i < vertexSize; ++i) {
             for (int j = 0; j < edges.size(); ++j) {
-                Integer vertex = vertexes.get(i);
                 Edge e = edges.get(j);
-                if (e.getSource().equals(vertex) || e.getTarget().equals(vertex))
+                if (e.getSource().equals(i) || e.getTarget().equals(i))
                     matrix[i][j] = 1;
                 else
                     matrix[i][j] = 0;
@@ -258,7 +252,7 @@ public class IncidMatrixUndir implements Graph {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Incident matrix : \n");
-        for (int i = 0; i < vertexes.size(); ++i) {
+        for (int i = 0; i < this.size(); ++i) {
             sb.append("[");
             for (int j = 0; j < edges.size(); ++j) {
                 sb.append(this.matrix[i][j]);
