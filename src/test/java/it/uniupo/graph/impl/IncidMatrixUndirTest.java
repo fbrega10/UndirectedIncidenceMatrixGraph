@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import upo.graph.base.Edge;
+import upo.graph.base.VisitResult;
 
 import java.util.NoSuchElementException;
 
@@ -71,6 +72,8 @@ class IncidMatrixUndirTest {
         Assertions.assertEquals(3, matrixUndir.size());
         Exception ex = Assertions.assertThrows(NoSuchElementException.class, () -> matrixUndir.removeVertex(4));
         Assertions.assertEquals("No such vertex!", ex.getMessage());
+        matrixUndir.removeVertex(2);
+        Assertions.assertEquals(2, matrixUndir.size());
     }
 
     @Test
@@ -162,6 +165,40 @@ class IncidMatrixUndirTest {
 
     @Test
     void getBFSTree() {
+        //first we visit a connected graph, then a forest.
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
+        VisitResult visitResult = matrixUndir.getBFSTree(0);
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(0));
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(1));
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(2));
+        Assertions.assertEquals(VisitResult.Color.WHITE, visitResult.getColor(3));
+        Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.getBFSTree(5));
+        Assertions.assertEquals("The vertex does not belong to the graph.", ex.getMessage());
+        matrixUndir = new IncidMatrixUndir();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        visitResult = matrixUndir.getBFSTree(0);
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(0));
+        Assertions.assertEquals(VisitResult.Color.WHITE, visitResult.getColor(1));
+        Assertions.assertEquals(VisitResult.Color.WHITE, visitResult.getColor(2));
+        Assertions.assertEquals(VisitResult.Color.WHITE, visitResult.getColor(3));
+    }
+    @Test
+    void belongsToEdgeTest(){
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        Edge edge = Edge.getEdgeByVertexes(0, 1);
+        matrixUndir.addEdge(edge);
+        Assertions.assertFalse(matrixUndir.belongsToEdge(3, edge));
+        Assertions.assertTrue(matrixUndir.belongsToEdge(0, edge));
+        Assertions.assertTrue(matrixUndir.belongsToEdge(1, edge));
     }
 
     @Test

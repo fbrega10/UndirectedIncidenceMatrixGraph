@@ -7,6 +7,7 @@ import upo.graph.base.VisitResult;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -74,12 +75,11 @@ public class IncidMatrixUndir implements Graph {
         edges = edges.stream()
                 .filter(e -> !this.belongsToEdge(integer, e))
                 .map(e -> {
-                    if (e.getSource() > integer || e.getTarget() > integer){
-                       int source =  e.getSource() > integer ? e.getSource() - 1 : e.getSource();
-                       int target = e.getTarget() > integer ? e.getTarget() - 1 : e.getTarget();
-                       return Edge.getEdgeByVertexes(source, target);
-                    }
-                    else return e;
+                    if (e.getSource() > integer || e.getTarget() > integer) {
+                        int source = e.getSource() > integer ? e.getSource() - 1 : e.getSource();
+                        int target = e.getTarget() > integer ? e.getTarget() - 1 : e.getTarget();
+                        return Edge.getEdgeByVertexes(source, target);
+                    } else return e;
                 })
                 .toList();
         this.rebuildMatrix(this.size() - 1);
@@ -185,13 +185,15 @@ public class IncidMatrixUndir implements Graph {
 
     @Override
     public VisitResult getBFSTree(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
-        /*
+
         if (!this.containsVertex(integer))
             throw new IllegalArgumentException("The vertex does not belong to the graph.");
 
         VisitResult visitResult = new VisitResult(this);
         LinkedList<Integer> queue = new LinkedList<>();
-        vertexes.forEach(vert -> visitResult.setColor(vert, VisitResult.Color.WHITE));
+        IntStream.range(0, matrix.length)
+                .boxed()
+                .forEach(vert -> visitResult.setColor(vert, VisitResult.Color.WHITE));
         queue.addLast(integer);
         visitResult.setDistance(integer, 0);
         visitResult.setColor(integer, VisitResult.Color.GRAY);
@@ -209,8 +211,6 @@ public class IncidMatrixUndir implements Graph {
             queue.removeFirst();
         }
         return visitResult;
-         */
-        return null;
     }
 
     @Override
