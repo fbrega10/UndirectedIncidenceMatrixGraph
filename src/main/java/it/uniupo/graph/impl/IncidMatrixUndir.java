@@ -65,13 +65,24 @@ public class IncidMatrixUndir implements Graph {
     public void removeVertex(Integer integer) throws NoSuchElementException {
         if (!this.containsVertex(integer))
             throw new NoSuchElementException("No such vertex!");
-        for (int i = 0; i < edges.size(); ++i){
-            if (matrix[integer][i] == 1){
+        for (int i = 0; i < edges.size(); ++i) {
+            if (matrix[integer][i] == 1) {
                 Edge edge = edges.get(i);
                 this.removeEdge(edge);
             }
         }
-        //TODO: devi sistemare da qui
+        edges = edges.stream()
+                .filter(e -> !this.belongsToEdge(integer, e))
+                .map(e -> {
+                    if (e.getSource() > integer || e.getTarget() > integer){
+                       int source =  e.getSource() > integer ? e.getSource() - 1 : e.getSource();
+                       int target = e.getTarget() > integer ? e.getTarget() - 1 : e.getTarget();
+                       return Edge.getEdgeByVertexes(source, target);
+                    }
+                    else return e;
+                })
+                .toList();
+        this.rebuildMatrix(this.size() - 1);
     }
 
     @Override
@@ -142,8 +153,8 @@ public class IncidMatrixUndir implements Graph {
     public boolean isAdjacent(Integer integer, Integer integer1) throws IllegalArgumentException {
         if (!this.containsVertex(integer) || !this.containsVertex(integer1))
             throw new IllegalArgumentException("Make sure all the vertexes are in the Graph");
-        for (int i = 0; i < edges.size(); ++i){
-            if (matrix[integer][i] == 1){
+        for (int i = 0; i < edges.size(); ++i) {
+            if (matrix[integer][i] == 1) {
                 Edge edge = edges.get(i);
                 if (edge.getTarget().equals(integer1) || edge.getSource().equals(integer1))
                     return true;
@@ -246,6 +257,10 @@ public class IncidMatrixUndir implements Graph {
                     matrix[i][j] = 0;
             }
         }
+    }
+
+    protected boolean belongsToEdge(Integer i, Edge e) {
+        return e.getSource().equals(i) || e.getTarget().equals(i);
     }
 
     @Override

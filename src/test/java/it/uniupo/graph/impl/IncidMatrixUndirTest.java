@@ -5,11 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import upo.graph.base.Edge;
-import upo.graph.base.VisitResult;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 class IncidMatrixUndirTest {
 
@@ -62,6 +59,18 @@ class IncidMatrixUndirTest {
 
     @Test
     void removeVertex() {
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 3));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(2, 1));
+        Assertions.assertEquals(4, matrixUndir.size());
+        matrixUndir.removeVertex(0);
+        Assertions.assertEquals(3, matrixUndir.size());
+        Exception ex = Assertions.assertThrows(NoSuchElementException.class, () -> matrixUndir.removeVertex(4));
+        Assertions.assertEquals("No such vertex!", ex.getMessage());
     }
 
     @Test
@@ -106,8 +115,8 @@ class IncidMatrixUndirTest {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
         matrixUndir.addVertex();
-        matrixUndir.addEdge(Edge.getEdgeByVertexes(2,3));
-        matrixUndir.addEdge(Edge.getEdgeByVertexes(2,0));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(2, 3));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(2, 0));
         Assertions.assertEquals(2, matrixUndir.getAdjacent(2).size());
         Assertions.assertEquals(2, matrixUndir.getAdjacent(3).iterator().next());
         Assertions.assertEquals(2, matrixUndir.getAdjacent(0).iterator().next());
@@ -121,8 +130,8 @@ class IncidMatrixUndirTest {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
         matrixUndir.addVertex();
-        matrixUndir.addEdge(Edge.getEdgeByVertexes(2,3));
-        matrixUndir.addEdge(Edge.getEdgeByVertexes(2,0));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(2, 3));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(2, 0));
         Assertions.assertTrue(matrixUndir.isAdjacent(2, 0));
         Assertions.assertTrue(matrixUndir.isAdjacent(2, 3));
         Assertions.assertTrue(matrixUndir.isAdjacent(3, 2));
