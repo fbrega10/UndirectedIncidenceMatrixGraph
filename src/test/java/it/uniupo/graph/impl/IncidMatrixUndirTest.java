@@ -190,8 +190,9 @@ class IncidMatrixUndirTest {
         Assertions.assertEquals(VisitResult.Color.WHITE, visitResult.getColor(2));
         Assertions.assertEquals(VisitResult.Color.WHITE, visitResult.getColor(3));
     }
+
     @Test
-    void belongsToEdgeTest(){
+    void belongsToEdgeTest() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
         Edge edge = Edge.getEdgeByVertexes(0, 1);
@@ -222,6 +223,9 @@ class IncidMatrixUndirTest {
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(3));
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(4));
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(5));
+
+        Exception e = Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.getDFSTree(23));
+        Assertions.assertEquals("Vertex does not belong to the Graph", e.getMessage());
     }
 
     @Test
