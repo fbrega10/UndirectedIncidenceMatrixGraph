@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -215,7 +217,42 @@ public class IncidMatrixUndir implements Graph {
 
     @Override
     public VisitResult getDFSTree(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
-        return null;
+        if (!this.containsVertex(integer))
+            throw new IllegalArgumentException("Vertex does not belong to the Graph");
+        VisitResult visitResult = new VisitResult(this);
+        IntStream.range(0, matrix.length)
+                .boxed()
+                .forEach(vertex -> {
+                    visitResult.setColor(vertex, VisitResult.Color.WHITE);
+                    visitResult.setStartTime(vertex, Integer.MAX_VALUE);
+                    visitResult.setEndTime(vertex, Integer.MAX_VALUE);
+                });
+
+        Stack<Integer> stack = new Stack<>();
+        AtomicInteger time = new AtomicInteger();
+        visitResult.setColor(integer, VisitResult.Color.GRAY);
+        stack.push(integer);
+        while (!stack.isEmpty()) {
+            Integer currentVertex = stack.lastElement();
+            if (visitResult.getStartTime(currentVertex) == Integer.MAX_VALUE)
+                visitResult.setStartTime(currentVertex, time.incrementAndGet());
+            this.getAdjacent(currentVertex)
+                    .stream()
+                    .filter(vert -> visitResult.getColor(vert).equals(VisitResult.Color.WHITE))
+                    .findFirst()
+                    .ifPresentOrElse(vert -> {
+                                stack.push(vert);
+                                visitResult.setColor(vert, VisitResult.Color.GRAY);
+                                visitResult.setParent(vert, currentVertex);
+                            }
+                            , () -> {
+                                visitResult.setColor(currentVertex, VisitResult.Color.BLACK);
+                                Integer i = stack.pop();
+                                visitResult.setColor(i, VisitResult.Color.BLACK);
+                                visitResult.setEndTime(i, time.incrementAndGet());
+                            });
+        }
+        return visitResult;
     }
 
     @Override
