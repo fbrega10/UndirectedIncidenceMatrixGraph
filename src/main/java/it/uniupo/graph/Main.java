@@ -1,4 +1,4 @@
-package it.uniupo;
+package it.uniupo.graph;
 
 
 public class Main {
