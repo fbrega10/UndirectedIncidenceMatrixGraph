@@ -30,6 +30,11 @@ public class IncidMatrixUndir implements Graph {
         this.matrix = new Integer[0][0];
     }
 
+    /**
+     * Rebuilds the matrix after adding a new vertex, increments the rows by one.
+     *
+     * @return an int that represents the vertix row position in the matrix.
+     */
     @Override
     public int addVertex() {
         int vertexIdx = this.size();
@@ -64,6 +69,16 @@ public class IncidMatrixUndir implements Graph {
         return integer != null && integer < this.size();
     }
 
+    /**
+     * Removes the vertex function parameter if it's present.
+     * Proceeds than to resize the matrix and eventually decrement all the vertexes
+     * that have a higher value than the removed vertex by one.
+     * It then fixes all the current edges decrementing each vertex that has been decremented
+     * accordingly before, to maintain the same matrix.
+     *
+     * @param integer
+     * @throws NoSuchElementException if the vertex does not belong to the graph.
+     */
     @Override
     public void removeVertex(Integer integer) throws NoSuchElementException {
         if (!this.containsVertex(integer))
@@ -87,6 +102,12 @@ public class IncidMatrixUndir implements Graph {
         this.rebuildMatrix(this.size() - 1);
     }
 
+    /**
+     * Adds a new edge if not present, with the given source/target vertexes.
+     *
+     * @param edge
+     * @throws IllegalArgumentException if the Edge contains vertexes that do not belong to the graph.
+     */
     @Override
     public void addEdge(Edge edge) throws IllegalArgumentException {
         if (edge == null || !this.containsVertex(edge.getSource()) || !this.containsVertex(edge.getTarget()))
@@ -99,7 +120,7 @@ public class IncidMatrixUndir implements Graph {
 
     /**
      * @param edge
-     * @return boolean, the edge is in the list?
+     * @return true is the edge belongs to the E Set of Edges, false otherwise.
      * @throws IllegalArgumentException
      */
     @Override
@@ -165,29 +186,48 @@ public class IncidMatrixUndir implements Graph {
         return false;
     }
 
+    /**
+     * @return The number of vertexes of the Graph.
+     */
     @Override
     public int size() {
         return this.matrix.length;
     }
 
+    /**
+     * @return False, it is not directed by default. This is an undirected incidence matrix implementation.
+     */
     @Override
     public boolean isDirected() {
         return false;
     }
 
+    /**
+     * @return True if the cyclic test detects a backward edge in the DFS visit.
+     * A backward edge is detected when the new edge has as targe a vertex which has previously
+     * been categorized as gray vertex (currently being visited), which denotes that there's a cycle
+     * if target node is not it's predecessor (remember that we're in a undirected matrix...).
+     */
     @Override
     public boolean isCyclic() {
         VisitResult visitResult = new VisitResult(this);
         IntStream.range(0, matrix.length)
                 .boxed()
                 .forEach(vert -> visitResult.setColor(vert, VisitResult.Color.WHITE));
-        for (int i = 0; i < this.size(); ++i){
+        for (int i = 0; i < this.size(); ++i) {
             if (visitResult.getColor(i).equals(VisitResult.Color.WHITE) && isCyclicRic(visitResult, i))
                 return true;
         }
         return false;
     }
 
+    /**
+     * This is the recursive function call of the isCyclic() method.
+     *
+     * @param visitResult the visitResult reference being passed in the function call.
+     * @param vertex      the current vertex.
+     * @return true if the cyclic test is positive otherwise it's false.
+     */
     private boolean isCyclicRic(VisitResult visitResult, Integer vertex) {
         visitResult.setColor(vertex, VisitResult.Color.GRAY);
         boolean cyclicFlag = this.getAdjacent(vertex)
@@ -200,7 +240,7 @@ public class IncidMatrixUndir implements Graph {
                 .stream()
                 .filter(ver -> visitResult.getColor(ver).equals(VisitResult.Color.WHITE))
                 .toList();
-        for (Integer i : integersToBeVisited){
+        for (Integer i : integersToBeVisited) {
             visitResult.setParent(i, vertex);
             if (isCyclicRic(visitResult, i))
                 return true;
@@ -208,11 +248,27 @@ public class IncidMatrixUndir implements Graph {
         return false;
     }
 
+    /**
+     * @return False, an undirected matrix is by default NOT directed, which makes this method false.
+     */
     @Override
     public boolean isDAG() {
         return false;
     }
 
+    /**
+     * This is the BFS visit of the Graph, it's backed by a Queue data structure
+     * to make sure each vertex is visited in the arrival order and only once.
+     * It creates a tree as output which tracks each level and each vertex distance
+     * from the source, tracking for each one it's predecessor.
+     * Each visit has asymptotic complexity of  O(m + n).
+     * N is the number of vertexes, while M is the length of the incident vertexes list.
+     *
+     * @param integer Source vertex of the Breadth First Search
+     * @return a VisitResult object which contains the output of the visit.
+     * @throws UnsupportedOperationException Does not, it is supported.
+     * @throws IllegalArgumentException      if the vertex does not belong to the graph.
+     */
     @Override
     public VisitResult getBFSTree(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
 
@@ -243,6 +299,17 @@ public class IncidMatrixUndir implements Graph {
         return visitResult;
     }
 
+    /**
+     * This visit is backed by a stack data structure, which contains each vertex that's being visited.
+     * It returns a tree in the VisitResult, which tracks each predecessor for each vertex and all of the
+     * start/end time of the visit of each vertex.
+     * This is the non-recursive version of the algorithm.
+     *
+     * @param integer
+     * @return
+     * @throws UnsupportedOperationException
+     * @throws IllegalArgumentException
+     */
     @Override
     public VisitResult getDFSTree(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
         if (!this.containsVertex(integer))
@@ -284,11 +351,18 @@ public class IncidMatrixUndir implements Graph {
     }
 
     /**
-     * Bonus: added as slides show the recursive version of the algorithm
+     * Bonus: added as slides show the recursive version of the algorithm.
+     * The stack being used is the computer stack that's created within each function call
+     * that allocates a new record and replicates all the local variables.
+     * To set the right start/end time for each vertex we must use an AtomicInteger
+     * which is passed by reference in each function call.
+     * It could be an Integer if it wasn't for the lambda function, which requires an Atomic/Volatile
+     * data.
+     *
      * @param integer
      * @return A VisitResult having visited the tree recursively
      * @throws UnsupportedOperationException
-     * @throws IllegalArgumentException as the vertex does not belong to the Graph
+     * @throws IllegalArgumentException      as the vertex does not belong to the Graph
      */
     public VisitResult getDFSTreeRic(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
         if (!this.containsVertex(integer))
@@ -308,12 +382,11 @@ public class IncidMatrixUndir implements Graph {
     }
 
     /**
-     * @param visitResult  VisitResult object containing each part of the visit.
+     * @param visitResult VisitResult object containing each part of the visit.
      * @param vertex
-     * @param time
-     * Recursive part of the getDFSTreeRic class method.
+     * @param time        Recursive part of the getDFSTreeRic class method.
      */
-    public void visitDFSRic(VisitResult visitResult, Integer vertex, AtomicInteger time){
+    public void visitDFSRic(VisitResult visitResult, Integer vertex, AtomicInteger time) {
         visitResult.setColor(vertex, VisitResult.Color.GRAY);
         visitResult.setStartTime(vertex, time.incrementAndGet());
         this.getAdjacent(vertex)
@@ -338,9 +411,15 @@ public class IncidMatrixUndir implements Graph {
         return null;
     }
 
+    /**
+     * Not supported as of the current implementation.
+     *
+     * @return nothing
+     * @throws UnsupportedOperationException
+     */
     @Override
     public Integer[] topologicalSort() throws UnsupportedOperationException {
-        return new Integer[0];
+        throw new UnsupportedOperationException("Cannot find a topologicalSort of a graph represented as an undirected incident matrix.");
     }
 
     @Override
@@ -354,7 +433,7 @@ public class IncidMatrixUndir implements Graph {
     }
 
     /**
-     * Adds one row to the matrix, enlarging the current data structure.
+     * Rebuilds the matrix accordingly to the vertex size parameter (no° of rows).
      */
     protected void rebuildMatrix(int vertexSize) {
         this.matrix = new Integer[vertexSize][edges.size()];
@@ -369,10 +448,23 @@ public class IncidMatrixUndir implements Graph {
         }
     }
 
+    /**
+     * Utility method which is useful in the context of undirected graphs.
+     * There is no direction, so opposite edges are the same for the matrix (opposite = source
+     * and target are switched).
+     *
+     * @param i Vertex
+     * @param e Edge
+     * @return true if the edge contains the vertex as source or target.
+     */
     protected boolean belongsToEdge(Integer i, Edge e) {
         return e.getSource().equals(i) || e.getTarget().equals(i);
     }
 
+    /**
+     * @return String representing a visualization of the matrix, just for debugging purpose,
+     * no use at all of this method.
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
