@@ -192,6 +192,33 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    void getDFSTreeRicTest(){
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
+        VisitResult visit = matrixUndir.getDFSTreeRic(0);
+        Assertions.assertNotNull(visit);
+        Assertions.assertEquals(VisitResult.Color.BLACK, visit.getColor(0));
+        Assertions.assertEquals(1, visit.getStartTime(0));
+        Assertions.assertEquals(VisitResult.Color.BLACK, visit.getColor(1));
+        Assertions.assertEquals(2, visit.getStartTime(1));
+        Assertions.assertEquals(VisitResult.Color.BLACK, visit.getColor(2));
+        Assertions.assertEquals(3, visit.getStartTime(2));
+        Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(3));
+        Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(4));
+        Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(5));
+
+        Exception e = Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.getDFSTreeRic(23));
+        Assertions.assertEquals("Vertex does not belong to the Graph", e.getMessage());
+
+    }
+
+    @Test
     void belongsToEdgeTest() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();

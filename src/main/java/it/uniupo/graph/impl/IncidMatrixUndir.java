@@ -255,6 +255,51 @@ public class IncidMatrixUndir implements Graph {
         return visitResult;
     }
 
+    /**
+     * Bonus: added as slides show the recursive version of the algorithm
+     * @param integer
+     * @return A VisitResult having visited the tree recursively
+     * @throws UnsupportedOperationException
+     * @throws IllegalArgumentException as the vertex does not belong to the Graph
+     */
+    public VisitResult getDFSTreeRic(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
+        if (!this.containsVertex(integer))
+            throw new IllegalArgumentException("Vertex does not belong to the Graph");
+
+        VisitResult visitResult = new VisitResult(this);
+        IntStream.range(0, matrix.length)
+                .boxed()
+                .forEach(vertex -> {
+                    visitResult.setColor(vertex, VisitResult.Color.WHITE);
+                    visitResult.setStartTime(vertex, Integer.MAX_VALUE);
+                    visitResult.setEndTime(vertex, Integer.MAX_VALUE);
+                });
+        AtomicInteger time = new AtomicInteger(0);
+        visitDFSRic(visitResult, integer, time);
+        return visitResult;
+    }
+
+    /**
+     * @param visitResult  VisitResult object containing each part of the visit.
+     * @param vertex
+     * @param time
+     * Recursive part of the getDFSTreeRic class method.
+     */
+    public void visitDFSRic(VisitResult visitResult, Integer vertex, AtomicInteger time){
+        visitResult.setColor(vertex, VisitResult.Color.GRAY);
+        visitResult.setStartTime(vertex, time.incrementAndGet());
+        this.getAdjacent(vertex)
+                .stream()
+                .filter(currentVertex -> visitResult.getColor(currentVertex).equals(VisitResult.Color.WHITE))
+                .forEach(currentVertex -> {
+                    visitResult.setParent(currentVertex, vertex);
+                    visitDFSRic(visitResult, currentVertex, time);
+                });
+        visitResult.setColor(vertex, VisitResult.Color.BLACK);
+        visitResult.setEndTime(vertex, time.incrementAndGet());
+    }
+
+
     @Override
     public VisitResult getDFSTOTForest(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
         return null;
