@@ -157,6 +157,38 @@ class IncidMatrixUndirTest {
 
     @Test
     void isCyclic() {
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(2, 3));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(3, 0));
+        Assertions.assertTrue(matrixUndir.isCyclic());
+        matrixUndir = new IncidMatrixUndir();
+        for (int i = 0; i < 10; ++i)
+            matrixUndir.addVertex();
+        for (int i = 0; i < 5; ++i)
+            matrixUndir.addEdge(Edge.getEdgeByVertexes(i, i+1));
+        Assertions.assertFalse(matrixUndir.isCyclic());
+        matrixUndir = new IncidMatrixUndir();
+        for (int i = 0; i < 10; ++i)
+            matrixUndir.addVertex();
+        for (int i = 0; i < 5; ++i)
+            matrixUndir.addEdge(Edge.getEdgeByVertexes(i, i+1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(5, 0));
+        Assertions.assertTrue(matrixUndir.isCyclic());
+        matrixUndir = new IncidMatrixUndir();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(2, 0));
+        Assertions.assertTrue(matrixUndir.isCyclic());
     }
 
     @Test

@@ -177,6 +177,34 @@ public class IncidMatrixUndir implements Graph {
 
     @Override
     public boolean isCyclic() {
+        VisitResult visitResult = new VisitResult(this);
+        IntStream.range(0, matrix.length)
+                .boxed()
+                .forEach(vert -> visitResult.setColor(vert, VisitResult.Color.WHITE));
+        for (int i = 0; i < this.size(); ++i){
+            if (visitResult.getColor(i).equals(VisitResult.Color.WHITE) && isCyclicRic(visitResult, i))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean isCyclicRic(VisitResult visitResult, Integer vertex) {
+        visitResult.setColor(vertex, VisitResult.Color.GRAY);
+        boolean cyclicFlag = this.getAdjacent(vertex)
+                .stream()
+                .filter(ver -> visitResult.getColor(ver).equals(VisitResult.Color.GRAY))
+                .anyMatch(ver -> !ver.equals(visitResult.getPartent(vertex)));
+        if (cyclicFlag)
+            return true;
+        List<Integer> integersToBeVisited = this.getAdjacent(vertex)
+                .stream()
+                .filter(ver -> visitResult.getColor(ver).equals(VisitResult.Color.WHITE))
+                .toList();
+        for (Integer i : integersToBeVisited){
+            visitResult.setParent(i, vertex);
+            if (isCyclicRic(visitResult, i))
+                return true;
+        }
         return false;
     }
 
