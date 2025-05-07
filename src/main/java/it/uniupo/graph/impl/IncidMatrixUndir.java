@@ -427,9 +427,59 @@ public class IncidMatrixUndir implements Graph {
         return Set.of();
     }
 
+    /**
+     * @return All the connected components of the graph represented as Set of Sets
+     * @throws UnsupportedOperationException
+     */
     @Override
     public Set<Set<Integer>> connectedComponents() throws UnsupportedOperationException {
-        return Set.of();
+        Set<Set<Integer>> completeSet = new HashSet<>();
+        VisitResult visitResult = new VisitResult(this);
+        IntStream.range(0, this.size())
+                .boxed()
+                .forEach(vert -> visitResult.setColor(vert, VisitResult.Color.WHITE));
+        for (int i = 0; i < this.size(); ++i) {
+            if (visitResult.getColor(i).equals(VisitResult.Color.WHITE)) {
+                completeSet.add(getConnectedComponentsDFS(i, visitResult));
+            }
+        }
+        return completeSet;
+    }
+
+    /**
+     * @param integer     source vertex of the visit
+     * @param visitResult of the current visit
+     * @return a Set of vertexes visited in the DFS
+     * @throws UnsupportedOperationException
+     * @throws IllegalArgumentException
+     */
+    public Set<Integer> getConnectedComponentsDFS(Integer integer, VisitResult visitResult) throws UnsupportedOperationException, IllegalArgumentException {
+        if (!this.containsVertex(integer))
+            throw new IllegalArgumentException("Vertex does not belong to the Graph");
+
+        Set<Integer> set = new HashSet<>();
+        Stack<Integer> stack = new Stack<>();
+        visitResult.setColor(integer, VisitResult.Color.GRAY);
+        stack.push(integer);
+        while (!stack.isEmpty()) {
+            Integer currentVertex = stack.lastElement();
+            set.add(currentVertex);
+            this.getAdjacent(currentVertex)
+                    .stream()
+                    .filter(vert -> visitResult.getColor(vert).equals(VisitResult.Color.WHITE))
+                    .findFirst()
+                    .ifPresentOrElse(vert -> {
+                                stack.push(vert);
+                                visitResult.setColor(vert, VisitResult.Color.GRAY);
+                                visitResult.setParent(vert, currentVertex);
+                            }
+                            , () -> {
+                                visitResult.setColor(currentVertex, VisitResult.Color.BLACK);
+                                Integer i = stack.pop();
+                                visitResult.setColor(i, VisitResult.Color.BLACK);
+                            });
+        }
+        return set;
     }
 
     /**
