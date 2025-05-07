@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import upo.graph.base.Edge;
 import upo.graph.base.VisitResult;
 
+import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 class IncidMatrixUndirTest {
 
@@ -305,5 +307,36 @@ class IncidMatrixUndirTest {
 
     @Test
     void connectedComponents() {
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(3, 4));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(4, 5));
+        Set<Set<Integer>> cc = matrixUndir.connectedComponents();
+        Assertions.assertTrue(cc.contains(Set.of(0, 1, 2)));
+        Assertions.assertTrue(cc.contains(Set.of(3, 4, 5)));
+        Assertions.assertEquals(2, cc.size());
+    }
+
+    @Test
+    void getConnectedComponentsDFS() {
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
+        Set<Integer> set = matrixUndir.getConnectedComponentsDFS(0, new VisitResult(matrixUndir));
+        Assertions.assertEquals(3, set.size());
+        Assertions.assertTrue(set.contains(0));
+        Assertions.assertTrue(set.contains(1));
+        Assertions.assertTrue(set.contains(2));
     }
 }
