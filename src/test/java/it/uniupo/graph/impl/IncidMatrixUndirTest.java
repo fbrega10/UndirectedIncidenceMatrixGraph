@@ -3,11 +3,11 @@ package it.uniupo.graph.impl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import upo.graph.base.Edge;
 import upo.graph.base.VisitResult;
 
-import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -21,9 +21,42 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("Empty constructor test")
     void emptyConstructorTest() {
         Assertions.assertEquals(0, matrixUndir.getVertices().size());
         Assertions.assertEquals(0, matrixUndir.getEdges().size());
+    }
+    @Test
+    @DisplayName("Equals test")
+    void equalsTest(){
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        IncidMatrixUndir other = new IncidMatrixUndir();
+        other.addVertex();
+        other.addVertex();
+        other.addVertex();
+        other.addEdge(Edge.getEdgeByVertexes(0, 1));
+        Assertions.assertEquals(matrixUndir, other);
+        other.addVertex();
+        Assertions.assertNotEquals(matrixUndir, other);
+    }
+    @Test
+    @DisplayName("HashCode test")
+    void hashCodeTest(){
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        IncidMatrixUndir other = new IncidMatrixUndir();
+        other.addVertex();
+        other.addVertex();
+        other.addVertex();
+        other.addEdge(Edge.getEdgeByVertexes(0, 1));
+        Assertions.assertEquals(matrixUndir.hashCode(), other.hashCode());
+        other.addVertex();
+        Assertions.assertNotEquals(matrixUndir.hashCode(), other.hashCode());
     }
 
     @Test
