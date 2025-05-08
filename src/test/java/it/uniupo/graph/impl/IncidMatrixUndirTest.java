@@ -26,9 +26,10 @@ class IncidMatrixUndirTest {
         Assertions.assertEquals(0, matrixUndir.getVertices().size());
         Assertions.assertEquals(0, matrixUndir.getEdges().size());
     }
+
     @Test
     @DisplayName("Equals test")
-    void equalsTest(){
+    void equalsTest() {
         IncidMatrixUndir other = new IncidMatrixUndir();
         Assertions.assertEquals(matrixUndir, other);
         matrixUndir.addVertex();
@@ -45,9 +46,10 @@ class IncidMatrixUndirTest {
         Assertions.assertNotEquals(null, matrixUndir);
         Assertions.assertNotEquals(new IncidMatrixUndir(), matrixUndir);
     }
+
     @Test
     @DisplayName("HashCode test")
-    void hashCodeTest(){
+    void hashCodeTest() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -91,6 +93,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("ContainsVertex test")
     void containsVertex() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -100,6 +103,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("removeVertex test")
     void removeVertex() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -118,6 +122,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("addEdge test")
     void addEdge() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -128,6 +133,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("containsEdge test")
     void containsEdge() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -140,6 +146,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("removeEdge test")
     void removeEdge() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -153,9 +160,11 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("getAdjacent test")
     void getAdjacent() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
+        Assertions.assertEquals(0, matrixUndir.getAdjacent(0).size());
         matrixUndir.addVertex();
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -168,9 +177,11 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("isAdjacent test")
     void isAdjacent() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
+        Assertions.assertFalse(matrixUndir.isAdjacent(0, 1));
         matrixUndir.addVertex();
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -185,18 +196,27 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("size test")
     void size() {
         Assertions.assertEquals(0, matrixUndir.size());
         matrixUndir.addVertex();
+        Assertions.assertEquals(1, matrixUndir.size());
         matrixUndir.addVertex();
         Assertions.assertEquals(2, matrixUndir.size());
+        matrixUndir.removeVertex(1);
+        Assertions.assertEquals(1, matrixUndir.size());
+        matrixUndir.removeVertex(0);
+        Assertions.assertEquals(0, matrixUndir.size());
     }
 
     @Test
+    @DisplayName("isDirected test")
     void isDirected() {
+        Assertions.assertFalse(matrixUndir.isDirected());
     }
 
     @Test
+    @DisplayName("isCyclic test")
     void isCyclic() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -233,10 +253,12 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("isDag test")
     void isDAG() {
     }
 
     @Test
+    @DisplayName("getBFSTree test")
     void getBFSTree() {
         //first we visit a connected graph, then a forest.
         matrixUndir.addVertex();
@@ -265,6 +287,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("getDFSTreeRic test")
     void getDFSTreeRicTest() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -285,13 +308,12 @@ class IncidMatrixUndirTest {
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(3));
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(4));
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(5));
-
         Exception e = Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.getDFSTreeRic(23));
         Assertions.assertEquals("Vertex does not belong to the Graph", e.getMessage());
-
     }
 
     @Test
+    @DisplayName("belongsToEdge test")
     void belongsToEdgeTest() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -303,6 +325,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("getDFSTree test")
     void getDFSTree() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -323,28 +346,36 @@ class IncidMatrixUndirTest {
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(3));
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(4));
         Assertions.assertEquals(VisitResult.Color.WHITE, visit.getColor(5));
-
         Exception e = Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.getDFSTree(23));
         Assertions.assertEquals("Vertex does not belong to the Graph", e.getMessage());
     }
 
     @Test
-    void getDFSTOTForest() {
+    @DisplayName("getDFSTOTForest test")
+    void getDFSTOTForestTest() {
     }
 
     @Test
+    @DisplayName("getDFSTOTForest test")
     void testGetDFSTOTForest() {
     }
 
     @Test
+    @DisplayName("topologicalSort test")
     void topologicalSort() {
+        UnsupportedOperationException e = Assertions.assertThrows(UnsupportedOperationException.class, () -> matrixUndir.topologicalSort());
+        Assertions.assertEquals("Cannot find a topologicalSort of a graph represented as an undirected incident matrix.", e.getMessage());
     }
 
     @Test
+    @DisplayName("stronglyConnectedComponents test")
     void stronglyConnectedComponents() {
+        UnsupportedOperationException e = Assertions.assertThrows(UnsupportedOperationException.class, () -> matrixUndir.stronglyConnectedComponents());
+        Assertions.assertEquals("Unsupported operation, this is an undirected matrix graph implementation.", e.getMessage());
     }
 
     @Test
+    @DisplayName("connectedComponents test")
     void connectedComponents() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();
@@ -360,22 +391,5 @@ class IncidMatrixUndirTest {
         Assertions.assertTrue(cc.contains(Set.of(0, 1, 2)));
         Assertions.assertTrue(cc.contains(Set.of(3, 4, 5)));
         Assertions.assertEquals(2, cc.size());
-    }
-
-    @Test
-    void getConnectedComponentsDFS() {
-        matrixUndir.addVertex();
-        matrixUndir.addVertex();
-        matrixUndir.addVertex();
-        matrixUndir.addVertex();
-        matrixUndir.addVertex();
-        matrixUndir.addVertex();
-        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
-        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
-        Set<Integer> set = matrixUndir.getConnectedComponentsDFS(0, new VisitResult(matrixUndir));
-        Assertions.assertEquals(3, set.size());
-        Assertions.assertTrue(set.contains(0));
-        Assertions.assertTrue(set.contains(1));
-        Assertions.assertTrue(set.contains(2));
     }
 }
