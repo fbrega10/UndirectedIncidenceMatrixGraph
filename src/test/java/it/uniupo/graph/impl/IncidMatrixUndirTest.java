@@ -255,6 +255,7 @@ class IncidMatrixUndirTest {
     @Test
     @DisplayName("isDag test")
     void isDAG() {
+       Assertions.assertFalse(matrixUndir.isDAG());
     }
 
     @Test
@@ -353,6 +354,32 @@ class IncidMatrixUndirTest {
     @Test
     @DisplayName("getDFSTOTForest test")
     void getDFSTOTForestTest() {
+        //First step : visit an empty graph
+        Assertions.assertThrows(IllegalArgumentException.class, () -> matrixUndir.getDFSTOTForest(0));
+        matrixUndir.addVertex();
+        Assertions.assertDoesNotThrow(() -> matrixUndir.getDFSTOTForest(0));
+        //Second step : visit the connected graph
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        VisitResult visitResult = matrixUndir.getDFSTOTForest(0);
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(0));
+        Assertions.assertEquals(VisitResult.Color.BLACK, visitResult.getColor(1));
+
+        //Third step: Visit the whole forest
+        matrixUndir = new IncidMatrixUndir();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
+        VisitResult forestVisit = matrixUndir.getDFSTOTForest(0);
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(0));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(1));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(2));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(3));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(4));
     }
 
     @Test

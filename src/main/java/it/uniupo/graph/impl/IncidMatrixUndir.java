@@ -404,7 +404,26 @@ public class IncidMatrixUndir implements Graph {
 
     @Override
     public VisitResult getDFSTOTForest(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
-        return null;
+        if (!this.containsVertex(integer))
+            throw new IllegalArgumentException(String.format("The graph does not contain the vertex %d", integer));
+        VisitResult visitResult = new VisitResult(this);
+        for (int i = 0; i < this.size(); ++i) {
+            if (visitResult.getColor(i).equals(VisitResult.Color.WHITE)) {
+                VisitResult currentVisit = this.getDFSTree(i);
+                IntStream.range(0, this.size())
+                        .boxed()
+                        .forEach(ver -> {
+                            if (currentVisit.getColor(ver).equals(VisitResult.Color.BLACK)){
+                                visitResult.setColor(ver, VisitResult.Color.BLACK);
+                                visitResult.setEndTime(ver, currentVisit.getEndTime(ver));
+                                visitResult.setStartTime(ver, currentVisit.getStartTime(ver));
+                                if (currentVisit.getPartent(ver) != null)
+                                    visitResult.setParent(ver, currentVisit.getPartent(ver));
+                            }
+                        });
+            }
+        }
+        return visitResult;
     }
 
     @Override
