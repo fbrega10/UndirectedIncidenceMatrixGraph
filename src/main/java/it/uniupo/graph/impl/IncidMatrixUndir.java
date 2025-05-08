@@ -5,11 +5,13 @@ import upo.graph.base.Graph;
 import upo.graph.base.VisitResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -529,5 +531,16 @@ public class IncidMatrixUndir implements Graph {
             sb.append("]\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof IncidMatrixUndir that)) return false;
+        return Objects.equals(edges, that.edges) && Objects.deepEquals(matrix, that.matrix);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(edges, Arrays.deepHashCode(matrix));
     }
 }
