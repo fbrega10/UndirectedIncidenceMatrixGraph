@@ -29,11 +29,12 @@ class IncidMatrixUndirTest {
     @Test
     @DisplayName("Equals test")
     void equalsTest(){
+        IncidMatrixUndir other = new IncidMatrixUndir();
+        Assertions.assertEquals(matrixUndir, other);
         matrixUndir.addVertex();
         matrixUndir.addVertex();
         matrixUndir.addVertex();
         matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
-        IncidMatrixUndir other = new IncidMatrixUndir();
         other.addVertex();
         other.addVertex();
         other.addVertex();
@@ -41,6 +42,8 @@ class IncidMatrixUndirTest {
         Assertions.assertEquals(matrixUndir, other);
         other.addVertex();
         Assertions.assertNotEquals(matrixUndir, other);
+        Assertions.assertNotEquals(null, matrixUndir);
+        Assertions.assertNotEquals(new IncidMatrixUndir(), matrixUndir);
     }
     @Test
     @DisplayName("HashCode test")
@@ -60,6 +63,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("addVertex test")
     void addVertex() {
         Assertions.assertEquals(0, matrixUndir.addVertex());
         Assertions.assertEquals(1, matrixUndir.addVertex());
@@ -67,6 +71,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("getVertices test")
     void getVertices() {
         Assertions.assertEquals(0, matrixUndir.getVertices().size());
         matrixUndir.addVertex();
@@ -75,6 +80,7 @@ class IncidMatrixUndirTest {
     }
 
     @Test
+    @DisplayName("getEdges test")
     void getEdges() {
         matrixUndir.addVertex();
         matrixUndir.addVertex();

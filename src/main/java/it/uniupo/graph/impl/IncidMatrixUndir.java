@@ -535,12 +535,13 @@ public class IncidMatrixUndir implements Graph {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof IncidMatrixUndir that)) return false;
-        return Objects.equals(edges, that.edges) && Objects.deepEquals(matrix, that.matrix);
+        if (!(o instanceof IncidMatrixUndir other)) return false;
+        return this.getVertices().equals(other.getVertices()) &&
+                this.getEdges().equals(other.getEdges());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(edges, Arrays.deepHashCode(matrix));
+        return Objects.hash(this.getEdges(), this.getVertices());
     }
 }
