@@ -19,8 +19,8 @@ import java.util.stream.IntStream;
 
 public class IncidMatrixUndir implements Graph {
 
-    private List<Edge> edges;
-    private Integer[][] matrix;
+    protected List<Edge> edges;
+    protected Double[][] matrix;
 
     /**
      * Constructor of an empty IncidentMatrix, all the fields
@@ -28,7 +28,7 @@ public class IncidMatrixUndir implements Graph {
      */
     protected IncidMatrixUndir() {
         this.edges = new ArrayList<>();
-        this.matrix = new Integer[0][0];
+        this.matrix = new Double[0][0];
     }
 
     /**
@@ -469,16 +469,33 @@ public class IncidMatrixUndir implements Graph {
      * Rebuilds the matrix accordingly to the vertex size parameter (no° of rows).
      */
     protected void rebuildMatrix(int vertexSize) {
-        this.matrix = new Integer[vertexSize][edges.size()];
-        for (int i = 0; i < vertexSize; ++i) {
-            for (int j = 0; j < edges.size(); ++j) {
-                Edge e = edges.get(j);
-                if (e.getSource().equals(i) || e.getTarget().equals(i))
-                    matrix[i][j] = 1;
-                else
-                    matrix[i][j] = 0;
+
+        Double[][] matr = new Double[vertexSize][edges.size()];
+
+        if (this.matrix != null && this.matrix.length > 0 && this.matrix[0] != null) {
+            int x = this.matrix.length;
+            int y = this.matrix[0].length;
+
+            for (int i = 0; i < x && i < vertexSize; ++i) {
+                for (int j = 0; j < y && j < edges.size(); ++j) {
+                    matr[i][j] = this.matrix[i][j];
+                }
             }
         }
+
+        for (int i = 0; i < vertexSize; ++i) {
+            for (int j = 0; j < edges.size(); ++j) {
+                if (matr[i][j] == null){
+                    Edge e = edges.get(j);
+                    if (e.getSource().equals(i) || e.getTarget().equals(i))
+                    {
+                        matr[i][j] = 1.0;
+                    } else
+                        matr[i][j] = 0.0;
+                }
+            }
+        }
+        this.matrix = matr;
     }
 
     /**
