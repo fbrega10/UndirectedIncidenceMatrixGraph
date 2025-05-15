@@ -85,7 +85,7 @@ public class IncidMatrixUndir implements Graph {
         if (!this.containsVertex(integer))
             throw new NoSuchElementException("No such vertex!");
         for (int i = 0; i < edges.size(); ++i) {
-            if (matrix[integer][i] == 1) {
+            if (matrix[integer][i] < Double.POSITIVE_INFINITY) {
                 Edge edge = edges.get(i);
                 this.removeEdge(edge);
             }
@@ -156,7 +156,7 @@ public class IncidMatrixUndir implements Graph {
             throw new NoSuchElementException("The vertex does not belong to the Graph.");
         Set<Integer> set = new HashSet<>();
         for (int i = 0; i < edges.size(); ++i) {
-            if (matrix[integer][i] == 1) {
+            if (matrix[integer][i] < Double.POSITIVE_INFINITY) {
                 Edge e = edges.get(i);
                 if (e.getTarget().equals(integer))
                     set.add(e.getSource());
@@ -178,7 +178,7 @@ public class IncidMatrixUndir implements Graph {
         if (!this.containsVertex(integer) || !this.containsVertex(integer1))
             throw new IllegalArgumentException("Make sure all the vertexes are in the Graph");
         for (int i = 0; i < edges.size(); ++i) {
-            if (matrix[integer][i] == 1) {
+            if (matrix[integer][i] < Double.POSITIVE_INFINITY) {
                 Edge edge = edges.get(i);
                 if (edge.getTarget().equals(integer1) || edge.getSource().equals(integer1))
                     return true;
@@ -413,7 +413,7 @@ public class IncidMatrixUndir implements Graph {
                 IntStream.range(0, this.size())
                         .boxed()
                         .forEach(ver -> {
-                            if (currentVisit.getColor(ver).equals(VisitResult.Color.BLACK)){
+                            if (currentVisit.getColor(ver).equals(VisitResult.Color.BLACK)) {
                                 visitResult.setColor(ver, VisitResult.Color.BLACK);
                                 visitResult.setEndTime(ver, currentVisit.getEndTime(ver));
                                 visitResult.setStartTime(ver, currentVisit.getStartTime(ver));
@@ -466,7 +466,10 @@ public class IncidMatrixUndir implements Graph {
     }
 
     /**
-     * Rebuilds the matrix accordingly to the vertex size parameter (no° of rows).
+     * @param vertexSize the number of vertexes
+     *                   Rebuild the matrix copying the current one into a new allocation
+     *                   and then checks any null value, which may mean a new vertex/edge.
+     *                   Keeps the weight of the current graph.
      */
     protected void rebuildMatrix(int vertexSize) {
 
@@ -485,13 +488,12 @@ public class IncidMatrixUndir implements Graph {
 
         for (int i = 0; i < vertexSize; ++i) {
             for (int j = 0; j < edges.size(); ++j) {
-                if (matr[i][j] == null){
+                if (matr[i][j] == null) {
                     Edge e = edges.get(j);
-                    if (e.getSource().equals(i) || e.getTarget().equals(i))
-                    {
-                        matr[i][j] = 1.0;
-                    } else
+                    if (e.getSource().equals(i) || e.getTarget().equals(i)) {
                         matr[i][j] = 0.0;
+                    } else
+                        matr[i][j] = Double.POSITIVE_INFINITY;
                 }
             }
         }
