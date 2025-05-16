@@ -15,14 +15,17 @@ public class IncidMatrixUndirWeight extends IncidMatrixUndir implements Weighted
 
     @Override
     public double getEdgeWeight(Edge edge) throws IllegalArgumentException, NoSuchElementException {
-        super.containsEdge(edge);
-        return super.matrix[edge.getSource()][edge.getSource()];
+        if (!this.containsEdge(edge))
+            throw new NoSuchElementException(String.format("The edge (%d, %d) does not belong to the graph", edge.getSource(), edge.getTarget()));
+        return super.matrix[edge.getSource()][edges.indexOf(edge)];
     }
 
     @Override
     public void setEdgeWeight(Edge edge, double v) throws IllegalArgumentException, NoSuchElementException {
-        super.containsEdge(edge);
-        super.matrix[edge.getSource()][edge.getTarget()] = super.matrix[edge.getTarget()][edge.getSource()] = v;
+        if (!this.containsEdge(edge))
+            throw new NoSuchElementException(String.format("The edge (%d, %d) does not belong to the graph", edge.getSource(), edge.getTarget()));
+        int edgeIndex = edges.indexOf(edge);
+        super.matrix[edge.getSource()][edgeIndex] = super.matrix[edge.getTarget()][edgeIndex] = v;
     }
 
     @Override
