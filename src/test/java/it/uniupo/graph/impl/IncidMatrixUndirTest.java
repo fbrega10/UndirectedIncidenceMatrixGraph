@@ -10,6 +10,7 @@ import upo.graph.base.VisitResult;
 
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 class IncidMatrixUndirTest {
 
@@ -255,7 +256,7 @@ class IncidMatrixUndirTest {
     @Test
     @DisplayName("isDag test")
     void isDAG() {
-       Assertions.assertFalse(matrixUndir.isDAG());
+        Assertions.assertFalse(matrixUndir.isDAG());
     }
 
     @Test
@@ -385,6 +386,20 @@ class IncidMatrixUndirTest {
     @Test
     @DisplayName("getDFSTOTForest test")
     void testGetDFSTOTForest() {
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(0, 1));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(1, 2));
+        matrixUndir.addEdge(Edge.getEdgeByVertexes(2, 4));
+        VisitResult forestVisit = matrixUndir.getDFSTOTForest(IntStream.range(0, 4).boxed().toArray(Integer[]::new));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(0));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(1));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(2));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(3));
+        Assertions.assertEquals(VisitResult.Color.BLACK, forestVisit.getColor(4));
     }
 
     @Test

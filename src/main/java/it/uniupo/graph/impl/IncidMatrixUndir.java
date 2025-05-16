@@ -5,6 +5,7 @@ import upo.graph.base.Graph;
 import upo.graph.base.VisitResult;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -406,10 +407,21 @@ public class IncidMatrixUndir implements Graph {
     public VisitResult getDFSTOTForest(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
         if (!this.containsVertex(integer))
             throw new IllegalArgumentException(String.format("The graph does not contain the vertex %d", integer));
+        Integer[] array = IntStream.range(0, this.size())
+                .boxed()
+                .toArray(Integer[]::new);
+        return this.getDFSTOTForest(array);
+    }
+
+    @Override
+    public VisitResult getDFSTOTForest(Integer[] integers) throws UnsupportedOperationException, IllegalArgumentException {
+        if (Arrays.stream(integers).anyMatch(val -> !containsVertex(val)))
+            throw new IllegalArgumentException("The graph does not contain the vertex");
+
         VisitResult visitResult = new VisitResult(this);
-        for (int i = 0; i < this.size(); ++i) {
-            if (visitResult.getColor(i).equals(VisitResult.Color.WHITE)) {
-                VisitResult currentVisit = this.getDFSTree(i);
+        for (Integer vertex : integers) {
+            if (visitResult.getColor(vertex).equals(VisitResult.Color.WHITE)) {
+                VisitResult currentVisit = this.getDFSTree(vertex);
                 IntStream.range(0, this.size())
                         .boxed()
                         .forEach(ver -> {
@@ -424,11 +436,6 @@ public class IncidMatrixUndir implements Graph {
             }
         }
         return visitResult;
-    }
-
-    @Override
-    public VisitResult getDFSTOTForest(Integer[] integers) throws UnsupportedOperationException, IllegalArgumentException {
-        return null;
     }
 
     /**
