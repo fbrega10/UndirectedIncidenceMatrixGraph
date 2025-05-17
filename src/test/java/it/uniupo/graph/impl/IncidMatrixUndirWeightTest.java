@@ -5,143 +5,84 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import upo.graph.base.Edge;
+import upo.graph.base.WeightedGraph;
 
 import java.util.NoSuchElementException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class IncidMatrixUndirWeightTest {
-    private IncidMatrixUndirWeight incidMatrixUndirWeight;
+    private WeightedGraph weightedGraph;
 
     @BeforeEach
     void setUp() {
-        incidMatrixUndirWeight = new IncidMatrixUndirWeight();
+        weightedGraph = new IncidMatrixUndirWeight();
     }
 
     @Test
     @DisplayName("Constructor test")
-    void constructorTest(){
-        Assertions.assertNotNull(incidMatrixUndirWeight);
-        Assertions.assertEquals(0, incidMatrixUndirWeight.size());
+    void constructorTest() {
+        Assertions.assertNotNull(weightedGraph);
+        Assertions.assertEquals(0, weightedGraph.size());
     }
 
     @Test
+    @DisplayName("Get edge weight test")
     void getEdgeWeight() {
-        incidMatrixUndirWeight.addVertex();
-        incidMatrixUndirWeight.addVertex();
-        Assertions.assertThrows(NoSuchElementException.class, () -> incidMatrixUndirWeight.getEdgeWeight(Edge.getEdgeByVertexes(
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        Assertions.assertThrows(NoSuchElementException.class, () -> weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(
                 0, 1)));
         Edge edge = Edge.getEdgeByVertexes(0, 1);
-        incidMatrixUndirWeight.addEdge(edge);
-        incidMatrixUndirWeight.setEdgeWeight(edge, 40.8);
-        Assertions.assertEquals(40.8, incidMatrixUndirWeight.getEdgeWeight(edge));
+        weightedGraph.addEdge(edge);
+        weightedGraph.setEdgeWeight(edge, 40.8);
+        Assertions.assertEquals(40.8, weightedGraph.getEdgeWeight(edge));
+        weightedGraph.setEdgeWeight(edge, 0);
+        Assertions.assertEquals(0, weightedGraph.getEdgeWeight(edge));
+        weightedGraph.removeEdge(edge);
+        Assertions.assertThrows(NoSuchElementException.class, () -> weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(
+                0, 1)));
     }
 
     @Test
     void setEdgeWeight() {
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        Edge missingEdge = Edge.getEdgeByVertexes(0, 2);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> weightedGraph.setEdgeWeight(missingEdge, 5));
+        weightedGraph.addVertex();
+        Edge edge = missingEdge;
+        weightedGraph.addEdge(edge);
+        Assertions.assertEquals(0, weightedGraph.getEdgeWeight(edge));
+        weightedGraph.setEdgeWeight(edge, 50);
+        Assertions.assertEquals(50, weightedGraph.getEdgeWeight(edge));
     }
 
     @Test
     void getBellmanFordShortestPaths() {
+        Exception e = Assertions.assertThrows(UnsupportedOperationException.class, () -> weightedGraph.getBellmanFordShortestPaths(0));
+        Assertions.assertEquals(IncidMatrixUndirWeight.UNSUPPORTED_IMPLEMENTATION, e.getMessage());
     }
 
     @Test
     void getDijkstraShortestPaths() {
+        Exception e = Assertions.assertThrows(UnsupportedOperationException.class, () -> weightedGraph.getDijkstraShortestPaths(0));
+        Assertions.assertEquals(IncidMatrixUndirWeight.UNSUPPORTED_IMPLEMENTATION, e.getMessage());
     }
 
     @Test
     void getPrimMST() {
+        Exception e = Assertions.assertThrows(UnsupportedOperationException.class, () -> weightedGraph.getPrimMST(0));
+        Assertions.assertEquals(IncidMatrixUndirWeight.UNSUPPORTED_IMPLEMENTATION, e.getMessage());
     }
 
     @Test
     void getKruskalMST() {
+        Exception e = Assertions.assertThrows(UnsupportedOperationException.class, () -> weightedGraph.getKruskalMST());
+        Assertions.assertEquals(IncidMatrixUndirWeight.UNSUPPORTED_IMPLEMENTATION, e.getMessage());
     }
 
     @Test
     void getFloydWarshallShortestPaths() {
-    }
-
-    @Test
-    void addVertex() {
-    }
-
-    @Test
-    void getVertices() {
-    }
-
-    @Test
-    void getEdges() {
-    }
-
-    @Test
-    void containsVertex() {
-    }
-
-    @Test
-    void removeVertex() {
-    }
-
-    @Test
-    void addEdge() {
-    }
-
-    @Test
-    void containsEdge() {
-    }
-
-    @Test
-    void removeEdge() {
-    }
-
-    @Test
-    void getAdjacent() {
-    }
-
-    @Test
-    void isAdjacent() {
-    }
-
-    @Test
-    void size() {
-    }
-
-    @Test
-    void isDirected() {
-    }
-
-    @Test
-    void isCyclic() {
-    }
-
-    @Test
-    void isDAG() {
-    }
-
-    @Test
-    void getBFSTree() {
-    }
-
-    @Test
-    void getDFSTree() {
-    }
-
-    @Test
-    void getDFSTOTForest() {
-    }
-
-    @Test
-    void testGetDFSTOTForest() {
-    }
-
-    @Test
-    void topologicalSort() {
-    }
-
-    @Test
-    void stronglyConnectedComponents() {
-    }
-
-    @Test
-    void connectedComponents() {
+        Exception e = Assertions.assertThrows(UnsupportedOperationException.class, () -> weightedGraph.getFloydWarshallShortestPaths());
+        Assertions.assertEquals(IncidMatrixUndirWeight.UNSUPPORTED_IMPLEMENTATION, e.getMessage());
     }
 }
