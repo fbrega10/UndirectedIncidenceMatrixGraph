@@ -31,6 +31,12 @@ class IncidMatrixUndirWeightTest {
         weightedGraph.addVertex();
         Assertions.assertThrows(NoSuchElementException.class, () -> weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(
                 0, 1)));
+        Exception e = Assertions.assertThrows(IllegalArgumentException.class, () -> weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(
+                0, 3)));
+        Assertions.assertEquals(String.format(IncidMatrixUndirWeight.VERTEX_NOT_PRESENT, 3), e.getMessage());
+        Exception ex = Assertions.assertThrows(IllegalArgumentException.class, () -> weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(
+                3, 0)));
+        Assertions.assertEquals(String.format(IncidMatrixUndirWeight.VERTEX_NOT_PRESENT, 3), ex.getMessage());
         Edge edge = Edge.getEdgeByVertexes(0, 1);
         weightedGraph.addEdge(edge);
         weightedGraph.setEdgeWeight(edge, 40.8);
@@ -47,7 +53,8 @@ class IncidMatrixUndirWeightTest {
         weightedGraph.addVertex();
         weightedGraph.addVertex();
         Edge missingEdge = Edge.getEdgeByVertexes(0, 2);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> weightedGraph.setEdgeWeight(missingEdge, 5));
+        Exception e = Assertions.assertThrows(IllegalArgumentException.class, () -> weightedGraph.setEdgeWeight(missingEdge, 5));
+        Assertions.assertEquals(String.format(IncidMatrixUndirWeight.VERTEX_NOT_PRESENT, 2), e.getMessage());
         weightedGraph.addVertex();
         Edge edge = missingEdge;
         weightedGraph.addEdge(edge);
