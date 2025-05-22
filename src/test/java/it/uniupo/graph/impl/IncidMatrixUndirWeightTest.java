@@ -132,4 +132,22 @@ class IncidMatrixUndirWeightTest {
         matrixUndir.addEdge(oneToTwo);
         Assertions.assertEquals(weightedGraph, matrixUndir);
     }
+
+    @Test
+    @DisplayName("Remove vertex test")
+    void removeVertex() {
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(0, 1));
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(0, 2));
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(0, 1), 40);
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(0, 2), 10);
+        weightedGraph.removeVertex(1);
+        Assertions.assertEquals(10, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(0, 1)));
+        Assertions.assertFalse(weightedGraph.getVertices().contains(4));
+        Assertions.assertFalse(weightedGraph.containsEdge(Edge.getEdgeByVertexes(0, 2)));
+    }
 }

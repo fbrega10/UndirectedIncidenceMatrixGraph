@@ -3,6 +3,7 @@ package it.uniupo.graph.impl;
 import upo.graph.base.Edge;
 import upo.graph.base.WeightedGraph;
 
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 public class IncidMatrixUndirWeight extends IncidMatrixUndir implements WeightedGraph {
@@ -40,6 +41,31 @@ public class IncidMatrixUndirWeight extends IncidMatrixUndir implements Weighted
         this.getEdgeWeight(edge);
         int edgeIndex = edges.indexOf(edge);
         super.matrix[edge.getSource()][edgeIndex] = super.matrix[edge.getTarget()][edgeIndex] = v;
+    }
+
+    /**
+     * @param integer the vertex that is being removed.
+     * @throws NoSuchElementException if the vertex is included in the graph.
+     *                                Overrides the superclass method, preserving the edges' weight.
+     */
+    @Override
+    public void removeVertex(Integer integer) throws NoSuchElementException {
+        if (!this.containsVertex(integer))
+            throw new NoSuchElementException("No such vertex!");
+        HashMap<Edge, Double> edgesWeightMap = new HashMap<>();
+        this.getEdges()
+                .forEach(edge -> {
+                    if (edge.getSource().equals(integer) || edge.getTarget().equals(integer))
+                        return;
+                    Integer source = edge.getSource() > integer ? edge.getSource() - 1 : edge.getSource();
+                    Integer target = edge.getTarget() > integer ? edge.getTarget() - 1 : edge.getTarget();
+                    Double weight = this.getEdgeWeight(edge);
+                    edgesWeightMap.put(Edge.getEdgeByVertexes(source, target), weight);
+                });
+        super.removeVertex(integer);
+        edgesWeightMap.keySet().forEach(key -> {
+            this.setEdgeWeight(key, edgesWeightMap.get(key));
+        });
     }
 
     /**
@@ -109,5 +135,10 @@ public class IncidMatrixUndirWeight extends IncidMatrixUndir implements Weighted
             return this.getEdgeWeight(edge) == other.getEdgeWeight(edge);
         });
         return super.equals(other) && booleanMarker;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString().replace("Incident matrix", "Weighted incident matrix");
     }
 }

@@ -475,8 +475,6 @@ public class IncidMatrixUndir implements Graph {
     /**
      * @param vertexSize the number of vertexes
      *                   Rebuild the matrix copying the current one into a new allocation
-     *                   and then checks any null value, which may mean a new vertex/edge.
-     *                   Keeps the weight of the current graph.
      */
     protected void rebuildMatrix(int vertexSize) {
 
@@ -527,9 +525,22 @@ public class IncidMatrixUndir implements Graph {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Incident matrix : \n");
+        sb.append("Incident matrix : \n\n");
+        sb.append(" ");
+        for (int i = 0; i < this.edges.size(); ++i) {
+            if (i > 0)
+                sb.append(",");
+            Edge currentEdge = edges.get(i);
+            sb.append(" (")
+                    .append(currentEdge.getSource())
+                    .append(",")
+                    .append(currentEdge.getTarget())
+                    .append(")");
+        }
+        sb.append("\n");
         for (int i = 0; i < this.size(); ++i) {
-            sb.append("[");
+            sb.append(i);
+            sb.append(" [");
             for (int j = 0; j < edges.size(); ++j) {
                 sb.append(this.matrix[i][j]);
                 if (j + 1 < edges.size())
