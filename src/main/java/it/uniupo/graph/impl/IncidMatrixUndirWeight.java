@@ -21,8 +21,8 @@ public class IncidMatrixUndirWeight extends IncidMatrixUndir implements Weighted
     /**
      * @param edge
      * @return the edge weight as double
-     * @throws IllegalArgumentException  if the graph does not contain the edges
-     * @throws NoSuchElementException whether one of the vertexes does not belong to the graph.
+     * @throws IllegalArgumentException if the graph does not contain the edges
+     * @throws NoSuchElementException   whether one of the vertexes does not belong to the graph.
      */
     @Override
     public double getEdgeWeight(Edge edge) throws IllegalArgumentException, NoSuchElementException {
@@ -93,4 +93,21 @@ public class IncidMatrixUndirWeight extends IncidMatrixUndir implements Weighted
         throw new UnsupportedOperationException(UNSUPPORTED_IMPLEMENTATION);
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof IncidMatrixUndirWeight))
+            return super.equals(o);
+        IncidMatrixUndirWeight other = (IncidMatrixUndirWeight) o;
+        boolean booleanMarker = this.getEdges().stream().allMatch(edge -> {
+            if (!other.containsEdge(edge))
+                return false;
+            return this.getEdgeWeight(edge) == other.getEdgeWeight(edge);
+        });
+        return super.equals(other) && booleanMarker;
+    }
 }

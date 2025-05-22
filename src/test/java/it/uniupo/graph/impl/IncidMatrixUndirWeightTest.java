@@ -92,4 +92,44 @@ class IncidMatrixUndirWeightTest {
         Exception e = Assertions.assertThrows(UnsupportedOperationException.class, () -> weightedGraph.getFloydWarshallShortestPaths());
         Assertions.assertEquals(IncidMatrixUndirWeight.UNSUPPORTED_IMPLEMENTATION, e.getMessage());
     }
+
+    @Test
+    @DisplayName("Equals test")
+    void equals() {
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        Edge zeroToOne = Edge.getEdgeByVertexes(0, 1);
+        Edge oneToTwo = Edge.getEdgeByVertexes(1, 2);
+        weightedGraph.addEdge(zeroToOne);
+        weightedGraph.addEdge(oneToTwo);
+        weightedGraph.setEdgeWeight(zeroToOne, 45);
+        weightedGraph.setEdgeWeight(oneToTwo, 47);
+        IncidMatrixUndirWeight incidMatrixUndirWeight = (IncidMatrixUndirWeight) weightedGraph;
+        Assertions.assertEquals(weightedGraph, incidMatrixUndirWeight);
+
+        incidMatrixUndirWeight = new IncidMatrixUndirWeight();
+        incidMatrixUndirWeight.addVertex();
+        incidMatrixUndirWeight.addVertex();
+        incidMatrixUndirWeight.addVertex();
+        incidMatrixUndirWeight.addVertex();
+        incidMatrixUndirWeight.addEdge(zeroToOne);
+        incidMatrixUndirWeight.addEdge(oneToTwo);
+        incidMatrixUndirWeight.setEdgeWeight(oneToTwo, 47);
+        incidMatrixUndirWeight.setEdgeWeight(zeroToOne, 9);
+        Assertions.assertNotEquals(weightedGraph, incidMatrixUndirWeight);
+
+        weightedGraph.setEdgeWeight(zeroToOne, 0.0);
+        weightedGraph.setEdgeWeight(oneToTwo, 0.0);
+
+        IncidMatrixUndir matrixUndir = new IncidMatrixUndir();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addVertex();
+        matrixUndir.addEdge(zeroToOne);
+        matrixUndir.addEdge(oneToTwo);
+        Assertions.assertEquals(weightedGraph, matrixUndir);
+    }
 }
