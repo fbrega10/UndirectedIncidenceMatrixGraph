@@ -8,6 +8,7 @@ import upo.graph.base.Edge;
 import upo.graph.base.WeightedGraph;
 
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 class IncidMatrixUndirWeightTest {
     private WeightedGraph weightedGraph;
@@ -61,6 +62,68 @@ class IncidMatrixUndirWeightTest {
         Assertions.assertEquals(0, weightedGraph.getEdgeWeight(edge));
         weightedGraph.setEdgeWeight(edge, 50);
         Assertions.assertEquals(50, weightedGraph.getEdgeWeight(edge));
+    }
+
+    @Test
+    @DisplayName("weighted graph - add vertex test")
+    void addVertex() {
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(1, 2));
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(3, 2));
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(3, 2), 54.9);
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(1, 2), 50);
+        weightedGraph.addVertex();
+        Assertions.assertEquals(54.9, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(3, 2)));
+        Assertions.assertEquals(50, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(1, 2)));
+    }
+
+    @Test
+    @DisplayName("weighted graph - add vertex test")
+    void removeEdge() {
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(1, 2));
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(3, 2));
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(3, 2), 54.9);
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(1, 2), 50);
+        Assertions.assertEquals(54.9, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(3, 2)));
+        Set<Edge> edgesBefore = weightedGraph.getEdges();
+        weightedGraph.removeEdge(Edge.getEdgeByVertexes(3, 2));
+        Exception e = Assertions.assertThrows(NoSuchElementException.class, () -> weightedGraph.removeEdge(Edge.getEdgeByVertexes(3, 2)));
+        Assertions.assertEquals("No such edge.", e.getMessage());
+        //checks in the edges collections before/after
+        Assertions.assertNotEquals(edgesBefore, weightedGraph.getEdges());
+        Assertions.assertEquals(2, edgesBefore.size());
+        Assertions.assertEquals(1, weightedGraph.getEdges().size());
+        Assertions.assertEquals(50, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(1, 2)));
+    }
+
+    @Test
+    void addEdge() {
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(1, 2));
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(3, 2));
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(3, 2), 54.9);
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(1, 2), 50);
+        Assertions.assertEquals(2, weightedGraph.getEdges().size());
+        Exception nullException = Assertions.assertThrows(IllegalArgumentException.class, () -> weightedGraph.addEdge(null));
+        Assertions.assertEquals("The edge cannot be null!", nullException.getMessage());
+        Exception sourceException = Assertions.assertThrows(IllegalArgumentException.class, () -> weightedGraph.addEdge(Edge.getEdgeByVertexes(2345, 1)));
+        Assertions.assertEquals("Cannot have an edge with invalid source/target", sourceException.getMessage());
+        Exception targetException = Assertions.assertThrows(IllegalArgumentException.class, () -> weightedGraph.addEdge(Edge.getEdgeByVertexes(1, 2345)));
+        Assertions.assertEquals("Cannot have an edge with invalid source/target", targetException.getMessage());
+        Assertions.assertDoesNotThrow(() -> weightedGraph.addEdge(Edge.getEdgeByVertexes(3, 2)));
     }
 
     @Test
@@ -149,5 +212,21 @@ class IncidMatrixUndirWeightTest {
         Assertions.assertEquals(10, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(0, 1)));
         Assertions.assertFalse(weightedGraph.getVertices().contains(4));
         Assertions.assertFalse(weightedGraph.containsEdge(Edge.getEdgeByVertexes(0, 2)));
+
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        Edge fiveToSix = Edge.getEdgeByVertexes(5, 6);
+        weightedGraph.addEdge(fiveToSix);
+        weightedGraph.setEdgeWeight(fiveToSix, 30);
+        weightedGraph.addEdge(Edge.getEdgeByVertexes(7, 8));
+        weightedGraph.setEdgeWeight(Edge.getEdgeByVertexes(7, 8), 5);
+        System.out.println(weightedGraph);
+        weightedGraph.removeVertex(5);
+        Assertions.assertEquals(5, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(6, 7)));
+        Assertions.assertEquals(10.0, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(0, 1)));
+        System.out.println(weightedGraph);
     }
 }

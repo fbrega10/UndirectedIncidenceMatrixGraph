@@ -68,6 +68,65 @@ public class IncidMatrixUndirWeight extends IncidMatrixUndir implements Weighted
         });
     }
 
+    @Override
+    public int addVertex() {
+        Double[][] matr = new Double[this.size() + 1][this.edges.size()];
+        for (int i = 0; i < this.size(); ++i) {
+            System.arraycopy(this.matrix[i], 0, matr[i], 0, this.edges.size());
+        }
+        for (int i = 0; i < this.edges.size(); ++i)
+            matr[this.size()][i] = Double.POSITIVE_INFINITY;
+        this.matrix = matr;
+        return this.size();
+    }
+
+    /**
+     * Adds a new edge if not present, with the given source/target vertexes.
+     * Every edge weight is preserved.
+     *
+     * @param edge
+     * @throws IllegalArgumentException if the Edge contains vertexes that do not belong to the graph.
+     */
+    @Override
+    public void addEdge(Edge edge) throws IllegalArgumentException {
+        if (edge == null)
+            throw new IllegalArgumentException("The edge cannot be null!");
+        if (!this.containsVertex(edge.getSource()) || !this.containsVertex(edge.getTarget()))
+            throw new IllegalArgumentException("Cannot have an edge with invalid source/target");
+        if (edges.contains(edge) || edges.contains(Edge.getEdgeByVertexes(edge.getTarget(), edge.getSource())))
+            return;
+        this.edges.add(edge);
+        Double[][] matr = new Double[this.size()][this.edges.size()];
+
+        for (int i = 0; i < this.size(); ++i) {
+            for (int j = 0; j < this.edges.size() - 1; ++j) {
+                matr[i][j] = this.matrix[i][j];
+            }
+        }
+        for (int i = 0; i < this.size(); ++i)
+            matr[i][this.edges.size() - 1] = this.belongsToEdge(i, edge) ? 0.0 : Double.POSITIVE_INFINITY;
+        this.matrix = matr;
+    }
+
+    /**
+     * @param edge
+     * @throws IllegalArgumentException One of the vertexes doesn't belong to the Graph's vertexes.
+     * @throws NoSuchElementException   the edge is not included in the current edges.
+     */
+    @Override
+    public void removeEdge(Edge edge) throws IllegalArgumentException, NoSuchElementException {
+        if (!this.containsEdge(edge))
+            throw new NoSuchElementException("No such edge.");
+        this.edges.remove(edge);
+        Double[][] matr = new Double[this.size()][this.edges.size()];
+        for (int i = 0; i < this.size(); ++i) {
+            for (int j = 0; j < this.edges.size(); ++j) {
+                matr[i][j] = this.matrix[i][j];
+            }
+        }
+        this.matrix = matr;
+    }
+
     /**
      * @param integer
      * @return Currently unsupported, throws an UnsupportedOperationException.

@@ -72,7 +72,7 @@ public class IncidMatrixUndir implements Graph {
     }
 
     /**
-     * Removes the vertex function parameter if it's present.
+     * Removes the vertex function parameter if present.
      * Proceeds than to resize the matrix and eventually decrement all the vertexes
      * that have a higher value than the removed vertex by one.
      * It then fixes all the current edges decrementing each vertex that has been decremented
@@ -100,7 +100,7 @@ public class IncidMatrixUndir implements Graph {
                         return Edge.getEdgeByVertexes(source, target);
                     } else return e;
                 })
-                .toList();
+                .collect(Collectors.toList());
         this.rebuildMatrix(this.size() - 1);
     }
 
@@ -354,7 +354,7 @@ public class IncidMatrixUndir implements Graph {
 
     /**
      * Bonus: added as slides show the recursive version of the algorithm.
-     * The stack being used is the computer stack that's created within each function call
+     * The stack being used is the computer's stack that's created within each function call
      * that allocates a new record and replicates all the local variables.
      * To set the right start/end time for each vertex we must use an AtomicInteger
      * which is passed by reference in each function call.
@@ -477,32 +477,12 @@ public class IncidMatrixUndir implements Graph {
      *                   Rebuild the matrix copying the current one into a new allocation
      */
     protected void rebuildMatrix(int vertexSize) {
-
-        Double[][] matr = new Double[vertexSize][edges.size()];
-
-        if (this.matrix != null && this.matrix.length > 0 && this.matrix[0] != null) {
-            int x = this.matrix.length;
-            int y = this.matrix[0].length;
-
-            for (int i = 0; i < x && i < vertexSize; ++i) {
-                for (int j = 0; j < y && j < edges.size(); ++j) {
-                    matr[i][j] = this.matrix[i][j];
-                }
-            }
-        }
-
-        for (int i = 0; i < vertexSize; ++i) {
+        this.matrix = new Double[vertexSize][edges.size()];
+        for (int i = 0; i < this.size(); ++i) {
             for (int j = 0; j < edges.size(); ++j) {
-                if (matr[i][j] == null) {
-                    Edge e = edges.get(j);
-                    if (e.getSource().equals(i) || e.getTarget().equals(i)) {
-                        matr[i][j] = 0.0;
-                    } else
-                        matr[i][j] = Double.POSITIVE_INFINITY;
-                }
+                this.matrix[i][j] = belongsToEdge(i, edges.get(j)) ? 0.0 : Double.POSITIVE_INFINITY;
             }
         }
-        this.matrix = matr;
     }
 
     /**
@@ -542,7 +522,7 @@ public class IncidMatrixUndir implements Graph {
             sb.append(i);
             sb.append(" [");
             for (int j = 0; j < edges.size(); ++j) {
-                sb.append(this.matrix[i][j]);
+                sb.append(this.matrix[i][j].equals(Double.POSITIVE_INFINITY) ? "∞" : this.matrix[i][j]);
                 if (j + 1 < edges.size())
                     sb.append(", ");
             }
