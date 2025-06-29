@@ -3,8 +3,16 @@ package it.uniupo.graph.impl;
 import upo.graph.base.Edge;
 import upo.graph.base.WeightedGraph;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class IncidMatrixUndirWeight extends IncidMatrixUndir implements WeightedGraph {
 
@@ -146,7 +154,93 @@ public class IncidMatrixUndirWeight extends IncidMatrixUndir implements Weighted
      */
     @Override
     public WeightedGraph getDijkstraShortestPaths(Integer integer) throws UnsupportedOperationException, IllegalArgumentException {
-        throw new UnsupportedOperationException(UNSUPPORTED_IMPLEMENTATION);
+        if (!this.containsVertex(integer))
+            throw new IllegalArgumentException(String.format("Vertex %d does not belong to the graph", integer));
+
+        WeightedGraph dijkstraVisitGraph = new IncidMatrixUndirWeight();
+        PriorityQueue<VertexDistance> priorityQueue =
+                new PriorityQueue<>(this.size(), Comparator.comparingDouble((v1 -> v1.distance)));
+
+        List<VertexDistance> vertexDistances = this.getVertices().stream()
+                .map(VertexDistance::new)
+                .peek(vertexDistance -> {
+                    if (Objects.equals(vertexDistance.vertex, integer))
+                        vertexDistance.setDistance(0.00);
+                    priorityQueue.add(vertexDistance);
+                    dijkstraVisitGraph.addVertex();
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        Set<Integer> blackVertexes = new HashSet<>();
+        while (!priorityQueue.isEmpty()) {
+            VertexDistance polledElement = priorityQueue.poll();
+            blackVertexes.add(polledElement.vertex);
+            this.getAdjacent(polledElement.vertex)
+                    .stream()
+                    .filter(v -> !blackVertexes.contains(v) )
+                    .forEach(adjacent -> {
+                        if (this.getEdgeWeight(Edge.getEdgeByVertexes(polledElement.vertex, adjacent)) + polledElement.distance
+                                < priorityQueue.stream()
+                                .filter(v -> Objects.equals(v.vertex, adjacent))
+                                .map(v -> v.distance)
+                                .findFirst().orElse(Double.POSITIVE_INFINITY)) {
+                            VertexDistance element = priorityQueue.stream()
+                                    .filter(v -> Objects.equals(v.vertex, adjacent))
+                                    .findFirst()
+                                    .orElse(null);
+                            priorityQueue.remove(element);
+                            element.setDistance(this.getEdgeWeight(Edge.getEdgeByVertexes(polledElement.vertex, adjacent)) + polledElement.distance);
+                            element.setPredecessor(polledElement.vertex);
+                            priorityQueue.add(element);
+                        }
+                    });
+        }
+        vertexDistances.forEach(element -> {
+            if (element.predecessor == null)
+                return;
+            Edge minimunEdge = Edge.getEdgeByVertexes(element.predecessor, element.vertex);
+            dijkstraVisitGraph.addEdge(minimunEdge);
+            dijkstraVisitGraph.setEdgeWeight(minimunEdge, element.distance);
+        });
+        return dijkstraVisitGraph;
+    }
+
+    public static class VertexDistance {
+        private final Integer vertex;
+        private Integer predecessor;
+        private Double distance;
+
+        public VertexDistance(Integer integer) {
+            this.vertex = integer;
+            this.predecessor = null;
+            this.distance = Double.POSITIVE_INFINITY;
+        }
+
+        public VertexDistance(Integer integer, Double distance) {
+            this(integer);
+            this.distance = distance;
+        }
+
+        public void setDistance(Double distance) {
+            if (distance < 0)
+                throw new UnsupportedOperationException("Cannot support negative weights in Dijkstra.");
+            this.distance = distance;
+        }
+
+        public void setPredecessor(Integer predecessor) {
+            this.predecessor = predecessor;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            VertexDistance other = (VertexDistance)obj;
+            return this.vertex.equals(other.vertex);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(vertex);
+        }
     }
 
     /**
