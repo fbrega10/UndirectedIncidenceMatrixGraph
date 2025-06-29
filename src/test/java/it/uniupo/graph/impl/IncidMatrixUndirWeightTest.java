@@ -305,4 +305,14 @@ class IncidMatrixUndirWeightTest {
         Assertions.assertEquals(10.0, weightedGraph.getEdgeWeight(Edge.getEdgeByVertexes(0, 1)));
         System.out.println(weightedGraph);
     }
+
+    @Test
+    void vertexDistanceTest(){
+        IncidMatrixUndirWeight.VertexDistance vd = new IncidMatrixUndirWeight.VertexDistance(4) ;
+        IncidMatrixUndirWeight.VertexDistance vd2 = new IncidMatrixUndirWeight.VertexDistance(4, 0.0) ;
+        vd.setDistance(4.0);
+        vd2.setDistance(5.0);
+        Assertions.assertEquals(vd, vd2);
+        Assertions.assertEquals(vd.hashCode(), vd2.hashCode());
+    }
 }
