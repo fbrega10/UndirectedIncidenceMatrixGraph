@@ -133,9 +133,37 @@ class IncidMatrixUndirWeightTest {
     }
 
     @Test
+    @DisplayName("Dijkstra shortest path test")
     void getDijkstraShortestPaths() {
-        Exception e = Assertions.assertThrows(UnsupportedOperationException.class, () -> weightedGraph.getDijkstraShortestPaths(0));
-        Assertions.assertEquals(IncidMatrixUndirWeight.UNSUPPORTED_IMPLEMENTATION, e.getMessage());
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+        weightedGraph.addVertex();
+
+        Edge edge_1_2 = Edge.getEdgeByVertexes(1, 2);
+        weightedGraph.addEdge(edge_1_2);
+        weightedGraph.setEdgeWeight(edge_1_2, 30);
+
+        Edge edge_1_3 = Edge.getEdgeByVertexes(1, 3);
+        weightedGraph.addEdge(edge_1_3);
+        weightedGraph.setEdgeWeight(edge_1_3, 20);
+
+        Edge edge_3_2 = Edge.getEdgeByVertexes(3, 2);
+        weightedGraph.addEdge(edge_3_2);
+        weightedGraph.setEdgeWeight(edge_3_2, 2);
+
+        Edge edge_1_4 = Edge.getEdgeByVertexes(1, 4);
+        weightedGraph.addEdge(edge_1_4);
+        weightedGraph.setEdgeWeight(edge_1_4, 52);
+
+        Edge edge_3_4 = Edge.getEdgeByVertexes(3, 4);
+        weightedGraph.addEdge(edge_3_4);
+        weightedGraph.setEdgeWeight(edge_3_4, 2);
+
+        WeightedGraph graph = weightedGraph.getDijkstraShortestPaths(1);
+        Assertions.assertEquals(22.0, graph.getEdgeWeight(edge_3_4));
+        Assertions.assertEquals(20.0, graph.getEdgeWeight(edge_1_3));
     }
 
     @Test
