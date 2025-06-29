@@ -165,6 +165,54 @@ class IncidMatrixUndirWeightTest {
         Assertions.assertEquals(22.0, graph.getEdgeWeight(edge_3_4));
         Assertions.assertEquals(20.0, graph.getEdgeWeight(edge_1_3));
     }
+    @Test
+    public void testDijkstraSimpleGraph() {
+        IncidMatrixUndirWeight graph = new IncidMatrixUndirWeight();
+
+        int v0 = graph.addVertex();
+        int v1 = graph.addVertex();
+        int v2 = graph.addVertex();
+        int v3 = graph.addVertex();
+
+        Edge e0 = Edge.getEdgeByVertexes(v0, v1);
+        Edge e1 = Edge.getEdgeByVertexes(v1, v2);
+        Edge e2 = Edge.getEdgeByVertexes(v0, v2);
+        Edge e3 = Edge.getEdgeByVertexes(v2, v3);
+
+        graph.addEdge(e0);
+        graph.setEdgeWeight(e0, 1.0);
+
+        graph.addEdge(e1);
+        graph.setEdgeWeight(e1, 2.0);
+
+        graph.addEdge(e2);
+        graph.setEdgeWeight(e2, 4.0);
+
+        graph.addEdge(e3);
+        graph.setEdgeWeight(e3, 1.0);
+
+        WeightedGraph result = graph.getDijkstraShortestPaths(v0);
+
+        // Verifica che l'albero dei cammini minimi contenga gli archi corretti
+        Assertions.assertTrue(result.containsEdge(e0)); // v0 -> v1
+        Assertions.assertTrue(result.containsEdge(e1)); // v1 -> v2
+        Assertions.assertTrue(result.containsEdge(e3)); // v2 -> v3
+
+        // Peso del cammino minimo da v0 a v3 deve essere 1 + 2 + 1 = 4
+        double totalDistance = graph.getEdgeWeight(e0) + graph.getEdgeWeight(e1) + graph.getEdgeWeight(e3);
+        Assertions.assertEquals(4.0, totalDistance);
+    }
+
+    @Test
+    public void testDijkstraThrowsOnInvalidSource() {
+        IncidMatrixUndirWeight graph = new IncidMatrixUndirWeight();
+        graph.addVertex();
+        graph.addVertex();
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            graph.getDijkstraShortestPaths(5); // vertice 5 non esiste
+        });
+    }
 
     @Test
     void getPrimMST() {

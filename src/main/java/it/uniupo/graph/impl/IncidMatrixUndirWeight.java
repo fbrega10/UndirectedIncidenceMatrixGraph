@@ -85,7 +85,7 @@ public class IncidMatrixUndirWeight extends IncidMatrixUndir implements Weighted
         for (int i = 0; i < this.edges.size(); ++i)
             matr[this.size()][i] = Double.POSITIVE_INFINITY;
         this.matrix = matr;
-        return this.size();
+        return this.size() - 1;
     }
 
     /**
